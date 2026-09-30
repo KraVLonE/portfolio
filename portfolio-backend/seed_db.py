@@ -25,6 +25,7 @@ async def seed_data():
         profile.location = "Durg, Chhattisgarh"
         profile.github_url = "https://github.com/KraVLonE"
         profile.linkedin_url = "https://linkedin.com/in/b-sai-sannidh/"
+        profile.resume_url = "https://drive.google.com/file/d/1RKA4K1VTu2cdwxMJx6DByn-yS_GhV9O5/view?usp=sharing"
         profile.codeforces_card_url = "https://codeforces-stat-card.vercel.app/api/KraVLonE?theme=cyberpunk&ext=contest&border=0&subtext=ffffff"
         profile.leetcode_card_url = "https://leetcard.jacoblin.cool/KraVLonE?theme=radical&font=Anek%20Tamil&ext=contest&border=0"
 

@@ -1,0 +1,13 @@
+version: '3.8'
+
+# This overrides the base docker-compose.yml for AWS Production
+services:
+  frontend:
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Inject the SSL Nginx config
+      - ./web-portfolio/nginx-ssl.conf:/etc/nginx/conf.d/default.conf:ro
+      # Mount the Let's Encrypt certificates generated on the EC2 host
+      - /etc/letsencrypt:/etc/letsencrypt:ro
