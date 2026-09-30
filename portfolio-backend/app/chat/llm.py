@@ -31,7 +31,8 @@ def invoke_llm(messages: list, temperature: float = 0.0) -> dict:
             "api_key_used": "none",
             "total_tokens": 0,
             "latency_ms": 0,
-            "retries": 0
+            "retries": 0,
+            "error": True
         }
 
     max_attempts = len(key_pool.keys)
@@ -74,7 +75,8 @@ def invoke_llm(messages: list, temperature: float = 0.0) -> dict:
                 "api_key_used": api_key[:8] + "...",
                 "total_tokens": tokens,
                 "latency_ms": latency,
-                "retries": attempt
+                "retries": attempt,
+                "error": False
             }
 
         except Exception as e:
@@ -90,7 +92,8 @@ def invoke_llm(messages: list, temperature: float = 0.0) -> dict:
                 "api_key_used": api_key[:8] + "...",
                 "total_tokens": 0,
                 "latency_ms": int((time.time() - start_time) * 1000),
-                "retries": attempt
+                "retries": attempt,
+                "error": True
             }
 
     return {
@@ -98,5 +101,6 @@ def invoke_llm(messages: list, temperature: float = 0.0) -> dict:
         "api_key_used": "exhausted",
         "total_tokens": 0,
         "latency_ms": int((time.time() - start_time) * 1000),
-        "retries": max_attempts
+        "retries": max_attempts,
+        "error": True
     }

@@ -56,6 +56,16 @@ def classify_intent(state: AgentState):
 
     response = invoke_llm([("system", "Output only JSON."), ("user", prompt)])
 
+    if response.get("error"):
+        return {
+            "intent": "llm_error",
+            "keyword": response["content"],
+            "api_key_used": response.get("api_key_used", "none"),
+            "total_tokens": response.get("total_tokens", 0),
+            "latency_ms": response.get("latency_ms", 0),
+            "retries": response.get("retries", 0)
+        }
+
     try:
         # Simple extraction of JSON if wrapped in markdown
         cleaned = response["content"].strip()
@@ -103,6 +113,8 @@ def fixed_response(state: AgentState):
         res = "I don't have access to personal private information. If you need to contact him, please use the contact form."
     elif intent == "abusive":
         res = "Let's keep the conversation professional."
+    elif intent == "llm_error":
+        res = "I'm currently experiencing high traffic or an AI backend issue. Please try again later or use the contact form!"
     else:
         res = "I didn't quite catch that. Could you ask about B Sai's experience or projects?"
 
@@ -144,8 +156,14 @@ def generate_response(state: AgentState):
     """
 
     response = invoke_llm([("user", prompt)])
+    
+    if response.get("error"):
+        raw_res = "I'm currently experiencing high traffic or an AI backend issue. Please try again later or use the contact form!"
+    else:
+        raw_res = response["content"]
+
     return {
-        "raw_response": response["content"],
+        "raw_response": raw_res,
         "api_key_used": response.get("api_key_used", "none"),
         "total_tokens": state.get("total_tokens", 0) + response.get("total_tokens", 0),
         "latency_ms": state.get("latency_ms", 0) + response.get("latency_ms", 0),
