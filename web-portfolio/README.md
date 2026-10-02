@@ -1,32 +1,27 @@
-# React + TypeScript + Vite
+# Web Portfolio (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+This directory contains the main user-facing React application for the portfolio. It is built using **Vite**, **TypeScript**, and **TailwindCSS**, and features a highly immersive, interactive Cyberpunk theme.
 
-Currently, two official plugins are available:
+## Features
+- **3D Interactive AI Terminal**: Users can chat with the LangGraph backend.
+- **Dynamic Content**: All Projects, Experience, and Skills are fetched dynamically from the PostgreSQL database via the FastAPI backend.
+- **Cyberpunk UI**: Glowing neon borders, scanlines, matrix rain effects, and terminal-style aesthetics.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Local Development
 
-## React Compiler
+If you want to run the frontend independently of Docker for fast hot-reloading:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Ensure the backend is running via Docker (`docker compose up db backend -d`).
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the Vite dev server:
+   ```bash
+   npm run dev
+   ```
+4. The dev server runs on `http://localhost:5173` and automatically proxies `/api/*` requests to the local backend running on port `8000`.
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Production Docker Build
+In production, this app is compiled via `npm run build` inside a Docker multi-stage build. The resulting static HTML/JS/CSS files are served by a lightweight **Nginx** container. 
+*Note: In production, this Nginx container does not handle SSL or edge routing—it strictly serves files and proxies its own `/api/` calls to the backend, sitting safely behind the global Traefik proxy.*

@@ -1,32 +1,31 @@
-# React + TypeScript + Vite
+# Admin Portfolio (Dashboard)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+This directory contains the secure backend Admin UI, allowing authorized users to manage the portfolio's content directly from the browser. 
 
-Currently, two official plugins are available:
+## Features
+- **Secure Authentication**: Requires the `ADMIN_SECRET_KEY` (configured in the backend `.env`) to access.
+- **Full CRUD Management**: Beautiful glowing editor panels to Add, Edit, and Delete:
+  - Profile Information & Social Links
+  - Work Experience
+  - Featured Projects
+  - Tech Skills (with virtual category state management)
+  - Achievements & Milestones
+- **Custom Tag Builder**: Easily add array-based pointers and tech stacks using the inline tag builder.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Local Development
 
-## React Compiler
+If you want to work on the Admin UI locally with hot-reloading:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Ensure the backend is running via Docker (`docker compose up db backend -d`).
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the Vite dev server:
+   ```bash
+   npm run dev
+   ```
+4. The dev server runs on `http://localhost:5174` (or whatever Vite assigns) and automatically proxies `/api/*` requests to the local backend on port `8000`.
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Production Architecture
+This dashboard is completely isolated from the main website. It runs in its own Docker container and is accessed via the `admin.kravlone.xyz` subdomain. The Traefik edge router automatically forwards traffic to this container's internal Nginx server, which serves the compiled React dashboard securely.
