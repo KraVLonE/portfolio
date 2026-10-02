@@ -9,7 +9,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portfolio-frontend.rule=Host(`kravlone.xyz`, `www.kravlone.xyz`)"
+      - "traefik.http.routers.portfolio-frontend.rule=Host(`kravlone.xyz`) || Host(`www.kravlone.xyz`)"
       - "traefik.http.routers.portfolio-frontend.entrypoints=websecure"
       - "traefik.http.routers.portfolio-frontend.tls.certresolver=letsencrypt"
       - "traefik.http.services.portfolio-frontend.loadbalancer.server.port=80"
