@@ -1,4 +1,4 @@
-Full Stack Portfolio
+# Full Stack Portfolio
 
 A modern, containerized full-stack portfolio built with **React**, **FastAPI**, **PostgreSQL**, and a **LangGraph-powered AI Chatbot**.
 
@@ -10,7 +10,6 @@ A modern, containerized full-stack portfolio built with **React**, **FastAPI**, 
 - **Backend (`portfolio-backend`)**: FastAPI (Python 3.12), SQLAlchemy (Async), Uvicorn.
 - **Database (`db`)**: PostgreSQL 15 (Alpine).
 - **AI Agent**: LangGraph with Gemini Flash, featuring PII masking, RAG over the portfolio database, strict intent classification, and API key rotation.
-- **Global Proxy / Edge Router**: Traefik (handles dynamic routing and Let's Encrypt SSL certificates automatically).
 
 ---
 
@@ -36,13 +35,7 @@ docker compose up --build -d
 ```
 *(Docker will automatically run database migrations on startup).*
 
-### 4. Seed the Database
-Because it's a fresh database, you need to populate it with your profile data. Run the seed script **inside** the running backend container:
-```bash
-docker exec -it portfolio-backend-1 python seed_db.py
-```
-
-### 5. Access the App Locally
+### 4. Access the App Locally
 - **Portfolio Frontend:** [http://localhost:8082](http://localhost:8082)
 - **Admin Panel:** [http://localhost:8081](http://localhost:8081)
 - **Backend API & Docs:** [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
@@ -63,12 +56,6 @@ Once Traefik is running, clone this repo on your EC2 instance, configure your `.
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 ```
 Traefik will instantly detect your containers, fetch SSL certificates, and route `kravlone.xyz` to your portfolio and `admin.kravlone.xyz` to your admin panel!
-
-### 3. Seed the Production Database
-Seed your production database once:
-```bash
-docker exec -it portfolio-backend-1 python seed_db.py
-```
 
 ---
 
