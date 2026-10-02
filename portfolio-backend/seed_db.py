@@ -34,6 +34,7 @@ async def seed_data():
         await session.execute(delete(Experience))
         await session.execute(delete(Project))
         await session.execute(delete(Skill))
+        await session.execute(delete(Achievement))
         # Adding Arpa Global Infotech
         exp1 = Experience(
             company="Arpa Global Infotech Pvt Ltd",
