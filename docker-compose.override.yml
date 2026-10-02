@@ -4,3 +4,11 @@ services:
   backend:
     ports:
       - "8000:8000"
+
+  admin:
+    ports:
+      - "8081:80"
+
+  frontend:
+    ports:
+      - "8082:80"

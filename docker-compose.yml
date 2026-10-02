@@ -32,8 +32,6 @@ services:
   admin:
     build:
       context: ./admin-portfolio
-    ports:
-      - "8081:80"
     depends_on:
       - backend
 
@@ -41,8 +39,6 @@ services:
     build:
       context: ./web-portfolio
     restart: always
-    ports:
-      - "8082:80"
     depends_on:
       - backend
 

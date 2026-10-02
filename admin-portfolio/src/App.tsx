@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, NavLink } from 'react-router-dom';
-import { User, Briefcase, FolderGit2, LogOut, Terminal, Trophy } from 'lucide-react';
+import { User, Briefcase, FolderGit2, LogOut, Terminal, Trophy, Layers } from 'lucide-react';
 import Login from './pages/Login';
 import ProfileEditor from './pages/ProfileEditor';
 import ExperienceEditor from './pages/ExperienceEditor';
 import ProjectsEditor from './pages/ProjectsEditor';
 import AchievementsEditor from './pages/AchievementsEditor';
+import SkillsEditor from './pages/SkillsEditor';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('adminToken'));
@@ -58,6 +59,7 @@ function App() {
             <NavItem to="/experience" icon={Briefcase} label="Experience" />
             <NavItem to="/projects" icon={FolderGit2} label="Projects" />
             <NavItem to="/achievements" icon={Trophy} label="Achievements" />
+            <NavItem to="/skills" icon={Layers} label="Skills" />
           </nav>
 
           <div className="p-4 border-t border-slate-800">
@@ -79,6 +81,7 @@ function App() {
               <Route path="/experience" element={<ExperienceEditor />} />
               <Route path="/projects" element={<ProjectsEditor />} />
               <Route path="/achievements" element={<AchievementsEditor />} />
+              <Route path="/skills" element={<SkillsEditor />} />
               <Route path="*" element={<Navigate to="/profile" />} />
             </Routes>
           </div>

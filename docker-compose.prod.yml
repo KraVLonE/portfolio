@@ -1,18 +1,30 @@
 version: '3.8'
 
-# This overrides the base docker-compose.yml for AWS Production
+# This overrides the base docker-compose.yml for AWS Production using Traefik
 services:
   frontend:
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      # Inject the SSL Nginx config
-      - ./web-portfolio/nginx-ssl.conf:/etc/nginx/conf.d/default.conf:ro
-      # Mount the Let's Encrypt certificates generated on the EC2 host
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+    # No exposed ports. Traefik will route traffic to this container's internal port 80.
+    networks:
+      - traefik-public
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portfolio-frontend.rule=Host(`kravlone.xyz`, `www.kravlone.xyz`)"
+      - "traefik.http.routers.portfolio-frontend.entrypoints=websecure"
+      - "traefik.http.routers.portfolio-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.portfolio-frontend.loadbalancer.server.port=80"
 
   admin:
-    build:
-      context: ./admin-portfolio
-    # No ports exposed directly, Nginx handles it
+    networks:
+      - traefik-public
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portfolio-admin.rule=Host(`admin.kravlone.xyz`)"
+      - "traefik.http.routers.portfolio-admin.entrypoints=websecure"
+      - "traefik.http.routers.portfolio-admin.tls.certresolver=letsencrypt"
+      - "traefik.http.services.portfolio-admin.loadbalancer.server.port=80"
+
+networks:
+  traefik-public:
+    external: true
