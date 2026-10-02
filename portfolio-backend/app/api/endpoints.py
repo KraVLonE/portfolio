@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List
 
 from app.core.database import get_db
+from app.core.rate_limit import limiter
 from app.services.email import send_notification_email
 from app.models.domain import Profile, Experience, Project, Skill, GithubStatsCache, ContactSubmission, Achievement
 from app.schemas import (
@@ -20,7 +21,8 @@ router = APIRouter()
 
 
 @router.post("/admin/login")
-async def admin_login(body: dict):
+@limiter.limit("3/minute")
+async def admin_login(request: Request, body: dict):
     from app.core.config import settings
     if body.get("key") == settings.ADMIN_SECRET_KEY:
         return {"authenticated": True}
@@ -61,12 +63,13 @@ async def get_github_stats(db: AsyncSession = Depends(get_db)):
     return stats
 
 @router.post("/contact", response_model=dict)
+@limiter.limit("3/minute")
 async def submit_contact(
+    request: Request,
     contact: ContactSubmissionCreate, 
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db)
 ):
-    # TODO: Add rate limiting and honeypot validation
     new_submission = ContactSubmission(**contact.model_dump())
     db.add(new_submission)
     await db.commit()
@@ -82,12 +85,10 @@ async def submit_contact(
 
 from pydantic import BaseModel
 
-from fastapi import Request
-from app.core.rate_limit import limiter
 from app.chat.agent import agent
 from app.models.domain import ChatLog
 
-from typing import List, Dict, Optional
+from typing import Dict, Optional
 
 class ChatRequest(BaseModel):
     message: str

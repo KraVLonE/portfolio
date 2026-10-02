@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -6,6 +6,7 @@ from typing import List
 from datetime import timedelta
 
 from app.core.database import get_db
+from app.core.rate_limit import limiter
 from app.core.security import verify_password, create_access_token, get_password_hash
 from app.core.config import settings
 from app.models.domain import AdminUser, Profile, Experience, Project, Skill
@@ -19,7 +20,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
     return {"user": "admin"}
 
 @router.post("/auth/login")
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+@limiter.limit("3/minute")
+async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(AdminUser).where(AdminUser.username == form_data.username))
     user = result.scalars().first()
     if not user or not verify_password(form_data.password, user.hashed_password):
@@ -138,4 +140,3 @@ async def delete_skill(skill_id: int, db: AsyncSession = Depends(get_db), curren
     await db.delete(skill)
     await db.commit()
     return {"status": "success"}
-
