@@ -9,6 +9,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=traefik-public"
       - "traefik.http.routers.portfolio-frontend.rule=Host(`kravlone.xyz`) || Host(`www.kravlone.xyz`)"
       - "traefik.http.routers.portfolio-frontend.entrypoints=websecure"
       - "traefik.http.routers.portfolio-frontend.tls.certresolver=letsencrypt"
@@ -20,6 +21,7 @@ services:
       - default
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=traefik-public"
       - "traefik.http.routers.portfolio-admin.rule=Host(`admin.kravlone.xyz`)"
       - "traefik.http.routers.portfolio-admin.entrypoints=websecure"
       - "traefik.http.routers.portfolio-admin.tls.certresolver=letsencrypt"
