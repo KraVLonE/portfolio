@@ -11,3 +11,8 @@ services:
       - ./web-portfolio/nginx-ssl.conf:/etc/nginx/conf.d/default.conf:ro
       # Mount the Let's Encrypt certificates generated on the EC2 host
       - /etc/letsencrypt:/etc/letsencrypt:ro
+
+  admin:
+    build:
+      context: ./admin-portfolio
+    # No ports exposed directly, Nginx handles it

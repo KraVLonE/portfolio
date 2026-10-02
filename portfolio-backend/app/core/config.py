@@ -11,6 +11,7 @@ class Settings(BaseSettings):
 
     # Security
     SECRET_KEY: str = "supersecretkey"  # change in production
+    ADMIN_SECRET_KEY: str = "admin123"  # change in production
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
 

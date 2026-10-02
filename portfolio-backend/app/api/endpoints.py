@@ -18,6 +18,14 @@ from app.schemas import (
 
 router = APIRouter()
 
+
+@router.post("/admin/login")
+async def admin_login(body: dict):
+    from app.core.config import settings
+    if body.get("key") == settings.ADMIN_SECRET_KEY:
+        return {"authenticated": True}
+    raise HTTPException(status_code=401, detail="Invalid secret key")
+
 @router.get("/profile", response_model=ProfileSchema)
 async def get_profile(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Profile).where(Profile.id == 1))
@@ -118,3 +126,149 @@ async def chat_with_agent(request: Request, body: ChatRequest, db: AsyncSession 
 async def get_achievements(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Achievement).order_by(Achievement.order))
     return result.scalars().all()
+
+from app.api.auth import verify_admin_token
+from app.schemas import (
+    ExperienceCreate, ExperienceUpdate, 
+    ProjectCreate, ProjectUpdate, 
+    SkillCreate, SkillUpdate,
+    AchievementCreate, AchievementUpdate
+)
+
+@router.put("/profile", response_model=ProfileSchema)
+async def update_profile(profile_in: ProfileSchema, db: AsyncSession = Depends(get_db), token: str = Depends(verify_admin_token)):
+    result = await db.execute(select(Profile).where(Profile.id == 1))
+    profile = result.scalars().first()
+    if not profile:
+        profile = Profile(id=1)
+        db.add(profile)
+    for key, value in profile_in.model_dump().items():
+        if hasattr(profile, key):
+            setattr(profile, key, value)
+    await db.commit()
+    await db.refresh(profile)
+    return profile
+
+# Experience
+@router.post("/experience", response_model=ExperienceSchema)
+async def create_experience(exp_in: ExperienceCreate, db: AsyncSession = Depends(get_db), token: str = Depends(verify_admin_token)):
+    new_exp = Experience(**exp_in.model_dump())
+    db.add(new_exp)
+    await db.commit()
+    await db.refresh(new_exp)
+    return new_exp
+
+@router.put("/experience/{exp_id}", response_model=ExperienceSchema)
+async def update_experience(exp_id: int, exp_in: ExperienceUpdate, db: AsyncSession = Depends(get_db), token: str = Depends(verify_admin_token)):
+    result = await db.execute(select(Experience).where(Experience.id == exp_id))
+    exp = result.scalars().first()
+    if not exp:
+        raise HTTPException(status_code=404, detail="Experience not found")
+    for key, value in exp_in.model_dump(exclude_unset=True).items():
+        setattr(exp, key, value)
+    await db.commit()
+    await db.refresh(exp)
+    return exp
+
+@router.delete("/experience/{exp_id}")
+async def delete_experience(exp_id: int, db: AsyncSession = Depends(get_db), token: str = Depends(verify_admin_token)):
+    result = await db.execute(select(Experience).where(Experience.id == exp_id))
+    exp = result.scalars().first()
+    if not exp:
+        raise HTTPException(status_code=404, detail="Experience not found")
+    await db.delete(exp)
+    await db.commit()
+    return {"status": "deleted"}
+
+# Projects
+@router.post("/projects", response_model=ProjectSchema)
+async def create_project(proj_in: ProjectCreate, db: AsyncSession = Depends(get_db), token: str = Depends(verify_admin_token)):
+    new_proj = Project(**proj_in.model_dump())
+    db.add(new_proj)
+    await db.commit()
+    await db.refresh(new_proj)
+    return new_proj
+
+@router.put("/projects/{proj_id}", response_model=ProjectSchema)
+async def update_project(proj_id: int, proj_in: ProjectUpdate, db: AsyncSession = Depends(get_db), token: str = Depends(verify_admin_token)):
+    result = await db.execute(select(Project).where(Project.id == proj_id))
+    proj = result.scalars().first()
+    if not proj:
+        raise HTTPException(status_code=404, detail="Project not found")
+    for key, value in proj_in.model_dump(exclude_unset=True).items():
+        setattr(proj, key, value)
+    await db.commit()
+    await db.refresh(proj)
+    return proj
+
+@router.delete("/projects/{proj_id}")
+async def delete_project(proj_id: int, db: AsyncSession = Depends(get_db), token: str = Depends(verify_admin_token)):
+    result = await db.execute(select(Project).where(Project.id == proj_id))
+    proj = result.scalars().first()
+    if not proj:
+        raise HTTPException(status_code=404, detail="Project not found")
+    await db.delete(proj)
+    await db.commit()
+    return {"status": "deleted"}
+
+# Skills
+@router.post("/skills", response_model=SkillSchema)
+async def create_skill(skill_in: SkillCreate, db: AsyncSession = Depends(get_db), token: str = Depends(verify_admin_token)):
+    new_skill = Skill(**skill_in.model_dump())
+    db.add(new_skill)
+    await db.commit()
+    await db.refresh(new_skill)
+    return new_skill
+
+@router.put("/skills/{skill_id}", response_model=SkillSchema)
+async def update_skill(skill_id: int, skill_in: SkillUpdate, db: AsyncSession = Depends(get_db), token: str = Depends(verify_admin_token)):
+    result = await db.execute(select(Skill).where(Skill.id == skill_id))
+    skill = result.scalars().first()
+    if not skill:
+        raise HTTPException(status_code=404, detail="Skill not found")
+    for key, value in skill_in.model_dump(exclude_unset=True).items():
+        setattr(skill, key, value)
+    await db.commit()
+    await db.refresh(skill)
+    return skill
+
+@router.delete("/skills/{skill_id}")
+async def delete_skill(skill_id: int, db: AsyncSession = Depends(get_db), token: str = Depends(verify_admin_token)):
+    result = await db.execute(select(Skill).where(Skill.id == skill_id))
+    skill = result.scalars().first()
+    if not skill:
+        raise HTTPException(status_code=404, detail="Skill not found")
+    await db.delete(skill)
+    await db.commit()
+    return {"status": "deleted"}
+
+# Achievements
+@router.post("/achievements", response_model=AchievementSchema)
+async def create_achievement(ach_in: AchievementCreate, db: AsyncSession = Depends(get_db), token: str = Depends(verify_admin_token)):
+    new_ach = Achievement(**ach_in.model_dump())
+    db.add(new_ach)
+    await db.commit()
+    await db.refresh(new_ach)
+    return new_ach
+
+@router.put("/achievements/{ach_id}", response_model=AchievementSchema)
+async def update_achievement(ach_id: int, ach_in: AchievementUpdate, db: AsyncSession = Depends(get_db), token: str = Depends(verify_admin_token)):
+    result = await db.execute(select(Achievement).where(Achievement.id == ach_id))
+    ach = result.scalars().first()
+    if not ach:
+        raise HTTPException(status_code=404, detail="Achievement not found")
+    for key, value in ach_in.model_dump(exclude_unset=True).items():
+        setattr(ach, key, value)
+    await db.commit()
+    await db.refresh(ach)
+    return ach
+
+@router.delete("/achievements/{ach_id}")
+async def delete_achievement(ach_id: int, db: AsyncSession = Depends(get_db), token: str = Depends(verify_admin_token)):
+    result = await db.execute(select(Achievement).where(Achievement.id == ach_id))
+    ach = result.scalars().first()
+    if not ach:
+        raise HTTPException(status_code=404, detail="Achievement not found")
+    await db.delete(ach)
+    await db.commit()
+    return {"status": "deleted"}

@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: var(--color-slate-950);
+    color: var(--color-slate-300);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(6, 182, 212, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.6); }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.35s ease-out forwards;
+  }
+  .glow-cyan {
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+  }
+  .glow-pink {
+    box-shadow: 0 0 10px rgba(236, 72, 153, 0.2);
+  }
+}

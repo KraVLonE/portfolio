@@ -29,14 +29,23 @@ services:
       db:
         condition: service_healthy
 
+  admin:
+    build:
+      context: ./admin-portfolio
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+
   frontend:
     build:
       context: ./web-portfolio
     restart: always
     ports:
-      - "80:80"
+      - "8082:80"
     depends_on:
       - backend
 
 volumes:
   postgres_data:
+
