@@ -273,3 +273,56 @@ async def delete_achievement(ach_id: int, db: AsyncSession = Depends(get_db), to
     await db.delete(ach)
     await db.commit()
     return {"status": "deleted"}
+
+# Chat Logs (Admin only)
+from app.schemas import ChatLog as ChatLogSchema
+
+@router.get("/chat-logs", response_model=List[ChatLogSchema])
+async def get_chat_logs(
+    db: AsyncSession = Depends(get_db),
+    token: str = Depends(verify_admin_token),
+    search: Optional[str] = None,
+    intent: Optional[str] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    sort: Optional[str] = "desc",
+    limit: int = 50,
+    offset: int = 0,
+):
+    from datetime import datetime as dt
+    query = select(ChatLog)
+
+    if search:
+        query = query.where(
+            ChatLog.user_query.ilike(f"%{search}%") | ChatLog.bot_response.ilike(f"%{search}%")
+        )
+    if intent:
+        query = query.where(ChatLog.intent == intent)
+    if date_from:
+        try:
+            query = query.where(ChatLog.created_at >= dt.fromisoformat(date_from))
+        except ValueError:
+            pass
+    if date_to:
+        try:
+            query = query.where(ChatLog.created_at <= dt.fromisoformat(date_to + "T23:59:59"))
+        except ValueError:
+            pass
+
+    if sort == "asc":
+        query = query.order_by(ChatLog.created_at.asc())
+    else:
+        query = query.order_by(ChatLog.created_at.desc())
+
+    query = query.offset(offset).limit(limit)
+    result = await db.execute(query)
+    return result.scalars().all()
+
+@router.get("/chat-logs/intents", response_model=List[str])
+async def get_chat_log_intents(
+    db: AsyncSession = Depends(get_db),
+    token: str = Depends(verify_admin_token),
+):
+    from sqlalchemy import distinct
+    result = await db.execute(select(distinct(ChatLog.intent)).order_by(ChatLog.intent))
+    return [row[0] for row in result.all()]

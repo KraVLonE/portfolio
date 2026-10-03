@@ -133,3 +133,18 @@ class Achievement(AchievementBase):
     id: int
     class Config:
         from_attributes = True
+
+class ChatLogBase(BaseModel):
+    user_query: str
+    bot_response: str
+    intent: str
+    latency_ms: int
+    total_tokens: int
+    retries: int
+    api_key_used: str
+
+class ChatLog(ChatLogBase):
+    id: int
+    created_at: dt_datetime
+    class Config:
+        from_attributes = True
