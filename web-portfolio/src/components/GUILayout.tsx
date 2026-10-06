@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useMode } from '../context/ModeContext';
-import { Terminal, Download, Mail, ExternalLink, GitBranch } from 'lucide-react';
+import { Terminal, Download, Mail, ExternalLink, GitBranch, Copy, Check } from 'lucide-react';
 import { GithubIcon } from './icons';
 import { fetchProfile, fetchExperience, fetchProjects, fetchSkills, fetchGithubStats, fetchAchievements } from '../api';
 import { CommandPalette } from './CommandPalette';
@@ -17,6 +17,7 @@ const GUILayout: React.FC = () => {
   const [achievements, setAchievements] = useState<any[]>([]);
   const [githubStats, setGithubStats] = useState<any>(null);
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [npxCopied, setNpxCopied] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -87,6 +88,27 @@ const GUILayout: React.FC = () => {
                 <GitBranch size={18} /> GitHub
               </a>
             )}
+
+            {/* Right-aligned TUI command chip */}
+            <div className="flex items-center gap-2.5 sm:ml-auto">
+              <span className="text-xs font-mono text-slate-500 tracking-wide select-none">Also visit</span>
+              <div className="flex items-center gap-2 px-3 py-2 bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-md font-mono text-xs transition-colors">
+                <span className="text-green-400 select-none">$</span>
+                <span className="text-slate-300">npx <span className="text-cyan-400 font-semibold">kravlone</span></span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText('npx kravlone');
+                    setNpxCopied(true);
+                    setTimeout(() => setNpxCopied(false), 2000);
+                  }}
+                  className="ml-1 p-1 text-slate-400 hover:text-cyan-400 rounded transition-colors cursor-pointer"
+                  title="Copy command"
+                  aria-label="Copy npx kravlone command"
+                >
+                  {npxCopied ? <Check size={13} className="text-green-400" /> : <Copy size={13} />}
+                </button>
+              </div>
+            </div>
           </div>
         </section>
         </FadeIn>
@@ -105,7 +127,21 @@ const GUILayout: React.FC = () => {
                 <div key={exp.id} className="relative pl-6 border-l border-slate-800 hover:border-cyan-500/50 transition-colors">
                   <div className="absolute w-2 h-2 bg-pink-500 rounded-none -left-[4.5px] top-2 shadow-[0_0_8px_rgba(236,72,153,0.8)]"></div>
                   <h3 className="text-xl font-semibold text-white">{exp.role}</h3>
-                  <div className="text-cyan-400 mb-4 font-mono text-sm">{exp.company}</div>
+                  <div className="text-cyan-400 font-mono text-sm">{exp.company}</div>
+                  <div className="text-slate-500 text-xs font-mono mb-4 flex items-center gap-1.5 mt-1">
+                    <span>
+                      {(() => {
+                        const start = new Date(exp.start_date);
+                        const end = exp.end_date ? new Date(exp.end_date) : new Date();
+                        const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                        const totalMonths = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+                        const yrs = Math.floor(totalMonths / 12);
+                        const mos = totalMonths % 12;
+                        const dur = [yrs > 0 ? `${yrs} yr${yrs > 1 ? 's' : ''}` : '', mos > 0 ? `${mos} mo${mos > 1 ? 's' : ''}` : ''].filter(Boolean).join(' ') || '< 1 mo';
+                        return `${fmt(start)} – ${exp.end_date ? fmt(end) : 'Present'} · ${dur}`;
+                      })()}
+                    </span>
+                  </div>
                   <ul className="list-disc pl-5 space-y-2 text-slate-300 mb-5 marker:text-slate-600">
                     {exp.pointers.map((ptr: string, i: number) => <li key={i} className="leading-relaxed">{ptr}</li>)}
                   </ul>
