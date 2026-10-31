@@ -91,7 +91,7 @@ const GUILayout: React.FC = () => {
 
             {/* Right-aligned TUI command chip */}
             <div className="flex items-center gap-2.5 sm:ml-auto">
-              <span className="text-xs font-mono text-slate-500 tracking-wide select-none">Also visit</span>
+              <span className="text-xs font-mono text-slate-400 tracking-wide select-none">Also visit</span>
               <div className="flex items-center gap-2 px-3 py-2 bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-md font-mono text-xs transition-colors">
                 <span className="text-green-400 select-none">$</span>
                 <span className="text-slate-300">npx <span className="text-cyan-400 font-semibold">kravlone</span></span>
@@ -128,7 +128,7 @@ const GUILayout: React.FC = () => {
                   <div className="absolute w-2 h-2 bg-pink-500 rounded-none -left-[4.5px] top-2 shadow-[0_0_8px_rgba(236,72,153,0.8)]"></div>
                   <h3 className="text-xl font-semibold text-white">{exp.role}</h3>
                   <div className="text-cyan-400 font-mono text-sm">{exp.company}</div>
-                  <div className="text-slate-500 text-xs font-mono mb-4 flex items-center gap-1.5 mt-1">
+                  <div className="text-slate-400 text-xs font-mono mb-4 flex items-center gap-1.5 mt-1">
                     <span>
                       {(() => {
                         const start = new Date(exp.start_date);
@@ -173,12 +173,12 @@ const GUILayout: React.FC = () => {
                     <h3 className="text-xl font-semibold text-white group-hover:text-cyan-400 transition-colors break-words">{proj.title}</h3>
                     <div className="flex items-center gap-3 shrink-0 mt-1">
                       {proj.links?.repo && (
-                        <a href={proj.links.repo} target="_blank" rel="noreferrer" className="text-slate-500 hover:text-white transition-colors" title="GitHub Repository">
+                        <a href={proj.links.repo} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition-colors" title="GitHub Repository" aria-label={`${proj.title} source code on GitHub`}>
                           <GithubIcon size={18}/>
                         </a>
                       )}
                       {proj.links?.live_demo && (
-                        <a href={proj.links.live_demo} target="_blank" rel="noreferrer" className="text-slate-500 hover:text-pink-400 transition-colors" title="Live Demo">
+                        <a href={proj.links.live_demo} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-pink-400 transition-colors" title="Live Demo" aria-label={`${proj.title} live demo`}>
                           <ExternalLink size={18}/>
                         </a>
                       )}
@@ -249,18 +249,18 @@ const GUILayout: React.FC = () => {
                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
                  <div className="bg-slate-950 p-4 rounded-md border border-slate-800 text-center">
                    <div className="text-2xl font-bold text-cyan-400">{githubStats.total_commits}</div>
-                   <div className="text-[10px] text-slate-500 font-mono mt-1 uppercase tracking-widest">Commits</div>
+                   <div className="text-[10px] text-slate-400 font-mono mt-1 uppercase tracking-widest">Commits</div>
                  </div>
                  <div className="bg-slate-950 p-4 rounded-md border border-slate-800 text-center">
                    <div className="text-2xl font-bold text-pink-400">{githubStats.total_prs}</div>
-                   <div className="text-[10px] text-slate-500 font-mono mt-1 uppercase tracking-widest">PRs</div>
+                   <div className="text-[10px] text-slate-400 font-mono mt-1 uppercase tracking-widest">PRs</div>
                  </div>
                  <div className="bg-slate-950 p-4 rounded-md border border-slate-800 text-center">
                    <div className="text-2xl font-bold text-yellow-400">{githubStats.total_repos}</div>
-                   <div className="text-[10px] text-slate-500 font-mono mt-1 uppercase tracking-widest">Repos</div>
+                   <div className="text-[10px] text-slate-400 font-mono mt-1 uppercase tracking-widest">Repos</div>
                  </div>
                  <div className="bg-slate-950 p-4 rounded-md border border-slate-800 text-center flex flex-col justify-center items-center">
-                   <div className="text-[10px] text-slate-500 font-mono mb-2 uppercase tracking-widest">Languages</div>
+                   <div className="text-[10px] text-slate-400 font-mono mb-2 uppercase tracking-widest">Languages</div>
                    <div className="flex gap-1.5 flex-wrap justify-center">
                      {githubStats.top_languages.slice(0, 3).map((l: any) => (
                        <span key={l.name} className="text-[9px] px-1.5 py-0.5 bg-slate-900 text-slate-300 font-mono rounded border border-slate-700">{l.name}</span>
@@ -338,16 +338,16 @@ const GUILayout: React.FC = () => {
               }
             }}>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5 font-mono">Name</label>
-                <input name="name" type="text" className="w-full bg-slate-950 border border-slate-800 rounded-md p-3 text-slate-100 focus:outline-none focus:border-cyan-500/50 transition-colors" required />
+                <label htmlFor="contact-name" className="block text-sm font-medium text-slate-300 mb-1.5 font-mono">Name</label>
+                <input id="contact-name" name="name" type="text" className="w-full bg-slate-950 border border-slate-800 rounded-md p-3 text-slate-100 focus:outline-none focus:border-cyan-500/50 transition-colors" required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5 font-mono">Email</label>
-                <input name="email" type="email" className="w-full bg-slate-950 border border-slate-800 rounded-md p-3 text-slate-100 focus:outline-none focus:border-cyan-500/50 transition-colors" required />
+                <label htmlFor="contact-email" className="block text-sm font-medium text-slate-300 mb-1.5 font-mono">Email</label>
+                <input id="contact-email" name="email" type="email" className="w-full bg-slate-950 border border-slate-800 rounded-md p-3 text-slate-100 focus:outline-none focus:border-cyan-500/50 transition-colors" required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5 font-mono">Message</label>
-                <textarea name="message" rows={4} className="w-full bg-slate-950 border border-slate-800 rounded-md p-3 text-slate-100 focus:outline-none focus:border-cyan-500/50 transition-colors resize-none" required></textarea>
+                <label htmlFor="contact-message" className="block text-sm font-medium text-slate-300 mb-1.5 font-mono">Message</label>
+                <textarea id="contact-message" name="message" rows={4} className="w-full bg-slate-950 border border-slate-800 rounded-md p-3 text-slate-100 focus:outline-none focus:border-cyan-500/50 transition-colors resize-none" required></textarea>
               </div>
               <button type="submit" disabled={formStatus === 'loading'} className="w-full py-3 bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-md font-medium transition-colors flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(6,182,212,0.2)] disabled:shadow-none cursor-pointer disabled:cursor-not-allowed">
                 <Mail size={18} /> {formStatus === 'loading' ? 'Transmitting...' : 'Send Message'}

@@ -94,7 +94,8 @@ export const CommandPalette: React.FC<{ profile: any }> = ({ profile }) => {
             role="combobox"
             aria-expanded="true"
             aria-controls="command-palette-list"
-            placeholder="Type a command or search..." 
+            placeholder="Type a command or search..."
+            aria-label="Command palette search"
             value={query}
             onChange={e => setQuery(e.target.value)}
             onKeyDown={handleInputKeyDown}
