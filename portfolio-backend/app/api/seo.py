@@ -70,7 +70,9 @@ async def _build_home(db: AsyncSession) -> dict:
 
     p = profile
     parts = [
-        '<main style="max-width:56rem;margin:0 auto;padding:7rem 1.5rem 6rem;color:#cbd5e1;background:#020617;font-family:system-ui,sans-serif">',
+        # Visually hidden (sr-only pattern): readable by crawlers/screen readers, never painted,
+        # so there's no flash before React replaces #root with the real UI.
+        '<main style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">',
         f"<header><h1>{_e(p.name)}</h1><p><strong>{_e(p.title)}</strong> · {_e(p.location)}</p>",
         f"<p>{_e(p.tagline)}</p><p>{_e(p.bio_short)}</p>",
         "<p>" + " · ".join(x for x in [_a(p.github_url, "GitHub"), _a(p.linkedin_url, "LinkedIn"), _a(p.resume_url, "Resume")] if x) + "</p></header>",
