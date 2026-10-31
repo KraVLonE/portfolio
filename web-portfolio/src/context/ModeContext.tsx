@@ -10,14 +10,15 @@ interface ModeContextType {
 const ModeContext = createContext<ModeContextType | undefined>(undefined);
 
 export const ModeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [mode, setMode] = useState<Mode>(() => {
-    const saved = localStorage.getItem('portfolio-mode');
-    return (saved === 'cli' || saved === 'gui') ? saved : 'gui';
-  });
+  // Mode is derived from the URL on load (not persisted): "/" always opens GUI,
+  // while a direct /cli/... link or refresh inside the CLI stays in CLI.
+  const [mode, setMode] = useState<Mode>(() =>
+    window.location.pathname.startsWith('/cli') ? 'cli' : 'gui'
+  );
 
   useEffect(() => {
-    localStorage.setItem('portfolio-mode', mode);
-  }, [mode]);
+    try { localStorage.removeItem('portfolio-mode'); } catch { /* storage unavailable */ }
+  }, []);
 
   const toggleMode = () => {
     setMode((prev) => (prev === 'gui' ? 'cli' : 'gui'));
