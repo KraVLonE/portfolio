@@ -65,6 +65,7 @@ export const ChatWidget: React.FC = () => {
     <>
       <button 
         onClick={() => setIsOpen(true)}
+        aria-label="Open AI chat assistant"
         className={`fixed bottom-6 right-6 p-4 bg-cyan-600 hover:bg-cyan-500 text-slate-950 rounded-full shadow-[0_0_20px_rgba(6,182,212,0.5)] transition-all z-40 ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
       >
         <Bot size={28} />
@@ -77,7 +78,7 @@ export const ChatWidget: React.FC = () => {
               <Terminal size={18} />
               <span className="font-mono font-bold tracking-wider text-sm">AGENT_INTERFACE v1.0</span>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-slate-500 hover:text-pink-400 transition-colors">
+            <button onClick={() => setIsOpen(false)} aria-label="Close chat" className="text-slate-400 hover:text-pink-400 transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -111,11 +112,13 @@ export const ChatWidget: React.FC = () => {
               type="text" 
               value={input}
               onChange={e => setInput(e.target.value)}
-              placeholder="Ask me anything..." 
+              placeholder="Ask me anything..."
+              aria-label="Ask the AI assistant a question"
               className="flex-1 bg-slate-900 border border-slate-800 rounded-md px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 transition-colors font-mono"
             />
             <button 
               type="submit"
+              aria-label="Send message"
               disabled={isLoading || !input.trim()}
               className="bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 p-2 rounded-md transition-colors flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
             >
