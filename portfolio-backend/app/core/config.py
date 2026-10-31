@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
 
+    # SEO: built SPA shell served by the frontend container
+    SPA_TEMPLATE_URL: str = "http://frontend/index.html"
+
     # Github stats cache time
     GITHUB_TOKEN: Optional[str] = None
 

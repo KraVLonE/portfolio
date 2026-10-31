@@ -73,6 +73,8 @@ async def root():
 
 from app.api.endpoints import router as api_router
 from app.api.admin_endpoints import router as admin_router
+from app.api.seo import router as seo_router
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.include_router(admin_router, prefix=settings.API_V1_STR)
+app.include_router(seo_router, prefix=settings.API_V1_STR)

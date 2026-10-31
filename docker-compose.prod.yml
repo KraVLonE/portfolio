@@ -13,6 +13,10 @@ services:
       - "traefik.http.routers.portfolio-frontend.rule=Host(`kravlone.xyz`) || Host(`www.kravlone.xyz`)"
       - "traefik.http.routers.portfolio-frontend.entrypoints=websecure"
       - "traefik.http.routers.portfolio-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.portfolio-frontend.middlewares=www-to-apex"
+      - "traefik.http.middlewares.www-to-apex.redirectregex.regex=^https?://www\\.kravlone\\.xyz/(.*)"
+      - "traefik.http.middlewares.www-to-apex.redirectregex.replacement=https://kravlone.xyz/$${1}"
+      - "traefik.http.middlewares.www-to-apex.redirectregex.permanent=true"
       - "traefik.http.services.portfolio-frontend.loadbalancer.server.port=80"
 
   admin:
