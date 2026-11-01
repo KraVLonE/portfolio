@@ -7,6 +7,7 @@ COPY package.json package-lock.json ./
 COPY shared/package.json shared/
 COPY web-portfolio/package.json web-portfolio/
 COPY admin-portfolio/package.json admin-portfolio/
+COPY web-blog/package.json web-blog/
 RUN npm ci --workspace=web-portfolio --workspace=@kravlone/shared --no-audit --no-fund
 
 COPY shared shared

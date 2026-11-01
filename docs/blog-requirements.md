@@ -204,3 +204,7 @@ One entry point: `make test` at repo root runs everything. Optional later: Playw
 | L15 | 2026-11-02 | Comments render through `CommentBody` (bold/italic/code/links only; links get `rel="nofollow ugc noopener noreferrer"`); bare URLs are not auto-linked | BLG-40 + no SEO value for spam links |
 | L16 | 2026-11-02 | Images whose URL is stripped as unsafe render `[image: alt]` instead of `<img src="">` | Empty `src` makes browsers re-request the page |
 | L17 | 2026-11-02 | Unsaved-changes guard = local autosave + confirm on in-app link clicks + `beforeunload` (no router migration) | `useBlocker` needs a data router; migrating the admin router would be an unrequested refactor |
+| L18 | 2026-11-02 | `SectionHeading` renders the label inline (`Title // LABEL`) | Matches every existing heading on the site and admin; label-above looked foreign next to them |
+| L19 | 2026-11-02 | Post page (Markdown + highlight.js) is lazy-loaded; blog list doesn't download it | NFR-04 spirit: list page stays light (~97 KB gz vs ~206 KB with post chunk) |
+| L20 | 2026-11-02 | `/media` served by blog nginx with immutable caching, `nosniff` and a sandboxing CSP | UUID filenames never change; CSP stops a mis-typed upload from running script on the blog origin |
+| L21 | 2026-11-02 | Main site's `VITE_BLOG_URL` defaults to `https://blog.kravlone.xyz` even in local docker | Avoids per-env build args; set `VITE_BLOG_URL=http://localhost:8083` in `web-portfolio/.env.local` for local dev |

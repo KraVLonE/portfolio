@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "@kravlone/shared/theme.css";
+@import "@kravlone/shared/markdown.css";
+
+@layer base {
+  body {
+    @apply bg-bg text-fg antialiased;
+  }
+}

@@ -45,3 +45,9 @@ export const fetchAchievements = async () => {
   if (!res.ok) throw new Error('Failed to fetch achievements');
   return res.json();
 };
+
+export const fetchLatestPosts = async () => {
+  const res = await fetch(`${API_URL}/blog/posts?per_page=3`);
+  if (!res.ok) throw new Error('Failed to fetch posts');
+  return (await res.json()).items;
+};
