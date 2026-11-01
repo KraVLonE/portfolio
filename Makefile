@@ -11,7 +11,7 @@ test-shared:
 	npm run typecheck -w @kravlone/shared && npm test -w @kravlone/shared
 
 test-web:
-	cd web-portfolio && npx tsc -b && npm run lint && npm run build
+	cd web-portfolio && npx tsc -b && npm run lint && npm test && npm run build
 
 test-admin:
 	cd admin-portfolio && npx tsc -b && npm run lint && npm test && npm run build

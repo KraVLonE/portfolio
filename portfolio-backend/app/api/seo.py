@@ -24,6 +24,8 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.core.rate_limit import limiter
 from app.models.domain import Achievement, Experience, Profile, Project, Skill
+from app.models.blog import BlogPost
+from app.blog.service import visible_posts
 
 router = APIRouter()
 
@@ -112,6 +114,13 @@ async def _build_home(db: AsyncSession) -> dict:
         parts.append('<section id="achievements"><h2>Achievements</h2><ul>')
         parts += [f"<li><strong>{_e(a.title)}</strong> — {_e(a.description)}</li>" for a in achs]
         parts.append("</ul></section>")
+
+    latest = (await db.execute(visible_posts().order_by(BlogPost.published_at.desc()).limit(3))).scalars().all()
+    if latest:
+        base = settings.BLOG_SITE_URL.rstrip("/")
+        parts.append('<section id="blog"><h2>Latest posts</h2><ul>')
+        parts += [f'<li><a href="{_e(base)}/{_e(p.slug)}">{_e(p.title)}</a></li>' for p in latest]
+        parts.append(f'</ul><p><a href="{_e(base)}/">All posts</a></p></section>')
 
     parts.append("</main>")
     return {
