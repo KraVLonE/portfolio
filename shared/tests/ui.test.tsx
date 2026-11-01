@@ -40,6 +40,13 @@ describe('TagButton', () => {
     expect(screen.getByRole('button', { name: 'devops' }).getAttribute('aria-pressed')).toBe('false');
   });
 
+  it('as a tab it drops aria-pressed (invalid on role=tab)', () => {
+    render(<TagButton role="tab" aria-selected active>pending</TagButton>);
+    const tab = screen.getByRole('tab', { name: 'pending' });
+    expect(tab.hasAttribute('aria-pressed')).toBe(false);
+    expect(tab.getAttribute('aria-selected')).toBe('true');
+  });
+
   it('static Tag is not interactive', () => {
     render(<Tag>py</Tag>);
     expect(screen.queryByRole('button')).toBeNull();

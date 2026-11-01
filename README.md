@@ -64,7 +64,7 @@ Once Traefik is running, clone this repo on your EC2 instance, configure your `.
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 ```
-Before the first blog deploy, add a DNS **A record `blog` → EC2 IP** (Traefik then issues its certificate).
+Before the first blog deploy, add a DNS **A record `blog` → EC2 IP** (Traefik then issues its certificate). Full checklist: [docs/DEPLOY-blog.md](./docs/DEPLOY-blog.md); verify with `scripts/smoke.sh https://blog.kravlone.xyz https://kravlone.xyz`.
 
 Traefik will instantly detect your containers, fetch SSL certificates, and route `kravlone.xyz` to your portfolio and `admin.kravlone.xyz` to your admin panel!
 
