@@ -1,9 +1,11 @@
 import { useRef, useState, type ComponentPropsWithoutRef } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import rehypeSlug from 'rehype-slug';
 import rehypeHighlight from 'rehype-highlight';
 import { cn } from '../ui/cn';
+import { fenceTextTrees, remarkNoSetext } from './plugins';
 
 export interface MarkdownRendererProps {
   markdown: string;
@@ -40,7 +42,8 @@ function CodeBlock({ children, node: _node, ...rest }: ComponentPropsWithoutRef<
       <button type="button" onClick={copy} className="md-copy" aria-label={copied ? 'Copied' : 'Copy code'}>
         {copied ? 'copied' : 'copy'}
       </button>
-      <pre ref={ref} {...rest}>{children}</pre>
+      {/* tabIndex: wide code scrolls horizontally; keyboard users must be able to reach it */}
+      <pre ref={ref} tabIndex={0} {...rest}>{children}</pre>
     </div>
   );
 }
@@ -48,7 +51,7 @@ function CodeBlock({ children, node: _node, ...rest }: ComponentPropsWithoutRef<
 function Table({ node: _node, ...rest }: ComponentPropsWithoutRef<'table'> & { node?: unknown }) {
   // BLG-53: wide tables scroll inside their box, never the page.
   return (
-    <div className="md-table">
+    <div className="md-table" tabIndex={0} role="region" aria-label="Table">
       <table {...rest} />
     </div>
   );
@@ -64,7 +67,8 @@ const COMPONENTS: Components = { a: Link, pre: CodeBlock, table: Table, img: Img
 
 /**
  * The one Markdown renderer for admin preview and the public blog (BLG-25).
- * GFM (BLG-20), highlighting (BLG-21), raw HTML dropped (BLG-22, skipHtml),
+ * GFM (BLG-20), single newline = line break, `---` is always a rule (no setext headings),
+ * highlighting (BLG-21), raw HTML dropped (BLG-22, skipHtml),
  * unsafe URLs stripped (react-markdown defaultUrlTransform), heading ids (BLG-23).
  */
 export function MarkdownRenderer({ markdown, className }: MarkdownRendererProps) {
@@ -72,11 +76,11 @@ export function MarkdownRenderer({ markdown, className }: MarkdownRendererProps)
     <div className={cn('md-prose', className)}>
       <ReactMarkdown
         skipHtml
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkNoSetext, remarkGfm, remarkBreaks]}
         rehypePlugins={[rehypeSlug, [rehypeHighlight, { detect: false }]]}
         components={COMPONENTS}
       >
-        {markdown}
+        {fenceTextTrees(markdown)}
       </ReactMarkdown>
     </div>
   );

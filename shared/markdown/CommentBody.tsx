@@ -1,4 +1,6 @@
 import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
+import { remarkNoSetext } from './plugins';
 import { cn } from '../ui/cn';
 
 /** BLG-40: comments allow only bold, italic, inline code and links. Everything else is unwrapped to text. */
@@ -9,6 +11,7 @@ export function CommentBody({ markdown, className }: { markdown: string; classNa
     <div className={cn('md-prose md-comment', className)}>
       <ReactMarkdown
         skipHtml
+        remarkPlugins={[remarkNoSetext, remarkBreaks]}
         allowedElements={ALLOWED}
         unwrapDisallowed
         components={{

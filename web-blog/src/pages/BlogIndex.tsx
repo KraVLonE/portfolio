@@ -1,33 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { SectionHeading, TagButton, buttonClass } from '@kravlone/shared/ui';
-import { blog, type PostPage, type TagCount } from '../api';
+import { SectionHeading, TagButton, buttonClass, cn } from '@kravlone/shared/ui';
+import { blog, type TagCount } from '../api';
+import { cacheKeys, useApi } from '../cache';
 import { PostCard, PostCardSkeleton } from '../components/PostCard';
 import { groupByYear, setPageMeta } from '../utils';
+
+const NO_TAGS: TagCount[] = [];
 
 /** BLG-11/12: newest first, tag chips (?tag=), year dividers, pagination. */
 export default function BlogIndex() {
   const [params, setParams] = useSearchParams();
   const tag = params.get('tag');
   const page = Math.max(1, Number(params.get('page')) || 1);
-  const [tags, setTags] = useState<TagCount[]>([]);
-  // Result is tagged with the query it belongs to; a mismatch means "loading".
-  const key = `${page}|${tag ?? ''}`;
-  const [result, setResult] = useState<{ key: string; data?: PostPage; error?: boolean }>({ key: '' });
-  const data = result.key === key ? result.data ?? null : null;
-  const error = result.key === key && !!result.error;
-
-  useEffect(() => { blog.tags().then(setTags).catch(() => {}); }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    const k = `${page}|${tag ?? ''}`;
-    blog.posts(page, tag)
-      .then((d) => !cancelled && setResult({ key: k, data: d }))
-      .catch(() => !cancelled && setResult({ key: k, error: true }));
-    return () => { cancelled = true; };
-  }, [page, tag]);
+  const tags = useApi(cacheKeys.tags, blog.tags).data ?? NO_TAGS;
+  const postsQ = useApi(cacheKeys.posts(page, tag), () => blog.posts(page, tag));
+  const data = postsQ.data;
 
   useEffect(() => {
     const t = tags.find((x) => x.slug === tag);
@@ -54,8 +43,10 @@ export default function BlogIndex() {
       </SectionHeading>
       <p className="-mt-4 mb-8 text-muted">Notes on GenAI, backend engineering and the things I break along the way.</p>
 
+      {/* min-h reserves the chip row so nothing jumps if tags arrive after posts */}
+      <div className="mb-10 min-h-[30px]">
       {tags.length > 0 && (
-        <div className="mb-10 flex flex-wrap gap-2" role="group" aria-label="Filter by topic">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by topic">
           <TagButton active={!tag} onClick={() => selectTag(null)}>all</TagButton>
           {tags.map((t) => (
             <TagButton key={t.slug} active={t.slug === tag} onClick={() => selectTag(t.slug)}>
@@ -64,10 +55,11 @@ export default function BlogIndex() {
           ))}
         </div>
       )}
+      </div>
 
-      {error ? (
+      {postsQ.error ? (
         <p role="alert" className="font-mono text-sm text-danger">Couldn't load posts. Try again in a moment.</p>
-      ) : data === null ? (
+      ) : postsQ.loading || !data ? (
         <div className="space-y-4" aria-busy="true" aria-label="Loading posts">
           {[0, 1, 2].map((i) => <PostCardSkeleton key={i} />)}
         </div>
@@ -76,7 +68,7 @@ export default function BlogIndex() {
           {tag ? <>No posts tagged <span className="text-neon">#{activeTag?.slug ?? tag}</span> yet. <Link to="/" className="text-neon underline">See all posts</Link></> : 'No posts yet. Check back soon.'}
         </div>
       ) : (
-        <>
+        <div aria-busy={postsQ.stale} className={cn('transition-opacity duration-150', postsQ.stale && 'opacity-60')}>
           {groupByYear(data.items).map((g) => (
             <section key={g.year} aria-labelledby={`y-${g.year}`} className="mb-10">
               <h2 id={`y-${g.year}`} className="mb-4 flex items-center gap-3 font-mono text-sm text-subtle">
@@ -99,7 +91,7 @@ export default function BlogIndex() {
               ) : <span />}
             </nav>
           )}
-        </>
+        </div>
       )}
     </>
   );

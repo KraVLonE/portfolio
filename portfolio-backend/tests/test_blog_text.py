@@ -1,6 +1,6 @@
 import pytest
 
-from app.blog.text import count_links, make_excerpt, plain_text, reading_time_min, render_markdown, slugify
+from app.blog.text import count_links, fence_text_trees, make_excerpt, plain_text, reading_time_min, render_markdown, slugify
 
 
 @pytest.mark.parametrize("title,slug", [
@@ -47,7 +47,7 @@ def test_excerpt_short_text_unchanged():
 
 
 @pytest.mark.parametrize("words,minutes", [(0, 1), (10, 1), (200, 1), (201, 2), (1000, 5)])
-def test_reading_time(words, minutes):
+def test_blg02_reading_time(words, minutes):
     assert reading_time_min("word " * words) == minutes
 
 
@@ -63,3 +63,20 @@ def test_count_links():
 def test_plain_text_inline_markup_adds_no_spaces():
     md = "I wired **retrieval**, *routing* and `tools`. See [docs](https://x).\n\n## Next\n\nMore"
     assert plain_text(md) == "I wired retrieval, routing and tools. See docs. Next More"
+
+
+def test_server_render_matches_spa_rules():
+    """SEO/RSS HTML must follow the same rules as the SPA renderer."""
+    assert "<h2>" not in render_markdown("Some intro\n---\n\nmore")
+    assert "<hr />" in render_markdown("Some intro\n---\n\nmore")
+    assert "line one<br />\nline two" in render_markdown("line one\nline two")
+    assert plain_text("line one\nline two") == "line one line two"
+
+
+def test_unfenced_tree_is_fenced_and_kept_out_of_excerpt():
+    tree = "notes/\n├── daily/\n│   └── a.md\n└── ref/\n    └── b.md"
+    html = render_markdown(f"Intro.\n\n{tree}\n\nAfter.")
+    assert '<pre><code class="language-text">' in html and "    └── b.md" in html
+    assert make_excerpt(f"Intro.\n\n{tree}\n\nAfter.") == "Intro. After."
+    assert fence_text_trees("one ─ line") == "one ─ line"
+    assert fence_text_trees("```\n├ a\n└ b\n```") == "```\n├ a\n└ b\n```"

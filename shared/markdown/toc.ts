@@ -2,6 +2,7 @@ import GithubSlugger from 'github-slugger';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { toString } from 'mdast-util-to-string';
 import type { Heading, Nodes } from 'mdast';
+import { NO_SETEXT } from './plugins';
 
 export interface TocItem {
   id: string;
@@ -27,7 +28,7 @@ export function extractToc(md: string): TocItem[] {
     }
     if ('children' in node) node.children.forEach((c) => walk(c as Nodes));
   };
-  walk(fromMarkdown(md ?? ''));
+  walk(fromMarkdown(md ?? '', { extensions: [NO_SETEXT] }));
   return items;
 }
 

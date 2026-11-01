@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { TagButton } from '@kravlone/shared/ui';
 import { MarkdownRenderer, extractToc, shouldShowToc } from '@kravlone/shared/markdown';
-import { ApiError, blog, type Post } from '../api';
+import { ApiError, blog } from '../api';
+import { cacheKeys, cacheSet, useApi } from '../cache';
 import { Comments } from '../components/Comments';
 import { PostCard } from '../components/PostCard';
 import { formatDate, setPageMeta, wasUpdated } from '../utils';
@@ -12,25 +13,20 @@ import NotFound from './NotFound';
 export default function PostPage() {
   const { slug = '' } = useParams();
   const navigate = useNavigate();
-  // Result is tagged with the slug it was fetched for; a mismatch means "loading".
-  const [result, setResult] = useState<{ slug: string; post?: Post; state: 'ok' | 'missing' | 'error' } | null>(null);
-  const post = result?.slug === slug ? result.post ?? null : null;
-  const state = result?.slug === slug ? result.state : 'loading';
+  const q = useApi(cacheKeys.post(slug), () => blog.post(slug));
+  // Never show the previous post while the next one loads.
+  const post = q.stale ? undefined : q.data;
+  const state = post ? 'ok' : q.error ? (q.error instanceof ApiError && q.error.status === 404 ? 'missing' : 'error') : 'loading';
 
   useEffect(() => {
-    let cancelled = false;
-    blog
-      .post(slug)
-      .then((p) => {
-        if (cancelled) return;
-        // BLG-04: API followed a 301 for a renamed slug -> show the canonical URL.
-        if (p.slug !== slug) navigate(`/${p.slug}${window.location.hash}`, { replace: true });
-        setResult({ slug: p.slug, post: p, state: 'ok' });
-        setPageMeta(`${p.title} | KraVLonE Blog`, p.excerpt);
-      })
-      .catch((e) => !cancelled && setResult({ slug, state: e instanceof ApiError && e.status === 404 ? 'missing' : 'error' }));
-    return () => { cancelled = true; };
-  }, [slug, navigate]);
+    if (!post) return;
+    // BLG-04: API followed a 301 for a renamed slug -> show the canonical URL.
+    if (post.slug !== slug) {
+      cacheSet(cacheKeys.post(post.slug), post);
+      navigate(`/${post.slug}${window.location.hash}`, { replace: true });
+    }
+    setPageMeta(`${post.title} | KraVLonE Blog`, post.excerpt);
+  }, [post, slug, navigate]);
 
   // Jump to #heading / #comments after content renders.
   useEffect(() => {
@@ -43,7 +39,7 @@ export default function PostPage() {
 
   if (state === 'missing') return <NotFound />;
   if (state === 'error') return <p role="alert" className="font-mono text-sm text-danger">Couldn't load this post. Try again in a moment.</p>;
-  if (state === 'loading' || !post) {
+  if (!post) {
     return (
       <div className="animate-pulse space-y-4" aria-busy="true" aria-label="Loading post">
         <div className="h-4 w-40 rounded bg-surface" />

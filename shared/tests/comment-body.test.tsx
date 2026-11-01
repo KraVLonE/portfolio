@@ -27,3 +27,11 @@ describe('BLG-40 CommentBody', () => {
     expect(c.querySelector('a')?.getAttribute('href') ?? '').not.toMatch(/javascript/i);
   });
 });
+
+describe('comment line breaks', () => {
+  it('single newline is a line break, --- does not make a heading', () => {
+    const c = html('hi\nthere\n---');
+    expect(c.querySelectorAll('br')).toHaveLength(1);
+    expect(c.querySelector('h2')).toBeNull();
+  });
+});
