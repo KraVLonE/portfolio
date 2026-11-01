@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMode } from '../context/ModeContext';
-import { fetchProfile, fetchExperience, fetchProjects, fetchSkills, fetchAchievements } from '../api';
+import { fetchProfile, fetchExperience, fetchProjects, fetchSkills, fetchAchievements, fetchBlogPosts, fetchBlogPost } from '../api';
+import { formatBlogListing, formatBlogPost } from './blogFiles';
+import { BLOG_URL } from '../blog/config';
 import { VirtualFileSystem } from './vfs';
 import { API_URL } from '../api';
 import { Loader2 } from 'lucide-react';
@@ -20,7 +22,7 @@ const levenshtein = (a: string, b: string) => {
   return matrix[a.length][b.length];
 };
 
-const AVAILABLE_COMMANDS = ['ls', 'cd', 'cat', 'pwd', 'clear', 'help', 'whoami', 'history', 'man', 'exit', 'gui'];
+const AVAILABLE_COMMANDS = ['ls', 'cd', 'cat', 'open', 'pwd', 'clear', 'help', 'whoami', 'history', 'man', 'exit', 'gui'];
 
 const CLILayout: React.FC = () => {
   const { toggleMode } = useMode();
@@ -61,10 +63,11 @@ const CLILayout: React.FC = () => {
       fetchExperience().catch(() => []),
       fetchProjects().catch(() => []),
       fetchSkills().catch(() => []),
-      fetchAchievements().catch(() => [])
-    ]).then(([p, e, pr, s, ach]) => {
+      fetchAchievements().catch(() => []),
+      fetchBlogPosts(50).catch(() => [])
+    ]).then(([p, e, pr, s, ach, posts]) => {
       if (cancelled) return;
-      setVfs(new VirtualFileSystem(p, e, pr, s, ach));
+      setVfs(new VirtualFileSystem(p, e, pr, s, ach, posts));
       setLoading(false);
       
       // Load stored command history (capped at 500)
@@ -267,6 +270,7 @@ const CLILayout: React.FC = () => {
                 <div><span className="text-blue-400">ls [dir]</span> - List directory contents</div>
                 <div><span className="text-blue-400">cd &lt;dir&gt;</span> - Change directory</div>
                 <div><span className="text-blue-400">cat &lt;file&gt;</span> - Print file contents</div>
+                <div><span className="text-blue-400">open &lt;post&gt;</span> - Open a blog post in a new tab (try: ls blog)</div>
                 <div><span className="text-blue-400">pwd</span> - Print working directory</div>
                 <div><span className="text-blue-400">clear</span> - Clear terminal</div>
                 <div><span className="text-blue-400">whoami</span> - Print current user</div>
@@ -314,6 +318,8 @@ const CLILayout: React.FC = () => {
               output = `ls: ${lsRes.error}`;
             } else if (lsRes.node?.type === 'file') {
               output = lsRes.node.name;
+            } else if (lsRes.path === '~/blog' && lsRes.node?.children) {
+              output = formatBlogListing(Object.values(lsRes.node.children));
             } else if (lsRes.node?.children) {
               const allChildren = Object.values(lsRes.node.children);
               const children = showHidden ? allChildren : allChildren.filter(c => !c.name.startsWith('.'));
@@ -356,10 +362,38 @@ const CLILayout: React.FC = () => {
               output = `cat: ${catRes.error}`;
             } else if (catRes.node?.type === 'dir') {
               output = `cat: ${targetFile}: Is a directory`;
+            } else if (catRes.node?.blog && catRes.node.content == null) {
+              // Blog posts are fetched on first read, then cached in the node.
+              try {
+                catRes.node.content = formatBlogPost(await fetchBlogPost(catRes.node.blog.slug), BLOG_URL);
+                output = catRes.node.content;
+              } catch (err) {
+                output = `cat: ${targetFile}: ${(err as Error).message}`;
+              }
             } else {
               output = catRes.node?.content || '';
             }
             break;
+
+          case 'open': {
+            const target = args[1];
+            if (!target) {
+              output = 'Usage: open <post>   (see: ls blog)';
+              break;
+            }
+            const withExt = target.endsWith('.md') ? target : `${target}.md`;
+            const res = [target, withExt, `~/blog/${withExt}`]
+              .map((t) => vfs.resolvePath(currentPath, t))
+              .find((r) => r.node?.blog || r.path === '~/blog');
+            if (!res) {
+              output = `open: ${target}: not a blog post (try: ls blog)`;
+            } else {
+              const url = res.node?.blog ? `${BLOG_URL}/${res.node.blog.slug}` : BLOG_URL;
+              window.open(url, '_blank', 'noopener,noreferrer');
+              output = `Opening ${url}`;
+            }
+            break;
+          }
             
           case 'sudo':
             if (args[1] === 'hire-me') {

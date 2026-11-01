@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     BLOG_MEDIA_DIR: str = "/app/media"  # docker volume, also mounted read-only into blog nginx
     BLOG_MEDIA_BASE_URL: str = "https://blog.kravlone.xyz/media"  # absolute so admin preview + RSS work
     BLOG_MAX_IMAGE_BYTES: int = 5 * 1024 * 1024
+    BLOG_SITE_URL: str = "https://blog.kravlone.xyz"  # canonical URLs, RSS, sitemap
+    BLOG_SPA_TEMPLATE_URL: str = "http://blog/index.html"  # built blog shell (SEO injection)
+    SITE_URL: str = "https://kravlone.xyz"
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 

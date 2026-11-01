@@ -85,3 +85,6 @@ from app.api.blog_admin import router as blog_admin_router
 
 app.include_router(blog_router, prefix=settings.API_V1_STR)
 app.include_router(blog_admin_router, prefix=settings.API_V1_STR)
+from app.api.blog_seo import router as blog_seo_router
+
+app.include_router(blog_seo_router, prefix=settings.API_V1_STR)

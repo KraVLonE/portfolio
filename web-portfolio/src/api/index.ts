@@ -46,8 +46,16 @@ export const fetchAchievements = async () => {
   return res.json();
 };
 
-export const fetchLatestPosts = async () => {
-  const res = await fetch(`${API_URL}/blog/posts?per_page=3`);
+export const fetchBlogPosts = async (perPage = 3) => {
+  const res = await fetch(`${API_URL}/blog/posts?per_page=${perPage}`);
   if (!res.ok) throw new Error('Failed to fetch posts');
   return (await res.json()).items;
+};
+
+export const fetchLatestPosts = () => fetchBlogPosts(3);
+
+export const fetchBlogPost = async (slug: string) => {
+  const res = await fetch(`${API_URL}/blog/posts/${encodeURIComponent(slug)}`);
+  if (!res.ok) throw new Error(res.status === 404 ? 'No such post' : 'Failed to fetch post');
+  return res.json();
 };

@@ -37,3 +37,17 @@ async def test_render_injects_escaped_content(client, admin_headers):
 
 async def test_render_unknown_path_404(client):
     assert (await client.get("/api/seo/render?path=/nope")).status_code == 404
+
+
+async def test_blg50_home_links_latest_blog_posts(client, admin_headers, monkeypatch):
+    from app.core.config import settings
+    monkeypatch.setattr(settings, "BLOG_SITE_URL", "https://blog.test")
+    await client.put("/api/profile", json={**f.PROFILE, "id": 1, "updated_at": "2025-01-01T00:00:00"}, headers=admin_headers)
+    html = (await client.get("/api/seo/render?path=/")).text
+    assert 'id="blog"' not in html  # no posts -> no section
+    seo._cache.clear()
+    p = (await client.post("/api/admin/blog/posts", json={"title": "First Post", "content_md": "x"}, headers=admin_headers)).json()
+    await client.post(f"/api/admin/blog/posts/{p['id']}/publish", headers=admin_headers)
+    await client.post("/api/admin/blog/posts", json={"title": "Draft", "content_md": "x"}, headers=admin_headers)
+    html = (await client.get("/api/seo/render?path=/")).text
+    assert '<a href="https://blog.test/first-post">First Post</a>' in html and "Draft" not in html

@@ -1,3 +1,5 @@
+import { buildBlogNodes, type BlogPostMeta } from './blogFiles';
+
 export type FileType = 'file' | 'dir';
 
 export interface VFSNode {
@@ -5,12 +7,14 @@ export interface VFSNode {
   name: string;
   content?: any;
   children?: Record<string, VFSNode>;
+  /** Set on ~/blog files; content is loaded on first `cat`. */
+  blog?: BlogPostMeta;
 }
 
 export class VirtualFileSystem {
   root: VFSNode;
 
-  constructor(profile: any, experience: any[], projects: any[], skills: any[], achievements: any[]) {
+  constructor(profile: any, experience: any[], projects: any[], skills: any[], achievements: any[], blogPosts: BlogPostMeta[] = []) {
     this.root = {
       type: 'dir',
       name: '~',
@@ -35,6 +39,11 @@ export class VirtualFileSystem {
           type: 'dir',
           name: 'achievements',
           children: this.buildAchievementNodes(achievements)
+        },
+        'blog': {
+          type: 'dir',
+          name: 'blog',
+          children: buildBlogNodes(blogPosts)
         },
         'contact.txt': { type: 'file', name: 'contact.txt', content: 'Contact me at: ' + (profile?.email || 'N/A') },
         '.secret': { type: 'file', name: '.secret', content: 'You found the Flag! sudo hire-me' }

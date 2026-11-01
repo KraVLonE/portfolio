@@ -3,3 +3,4 @@ Allow: /
 Disallow: /api/
 
 Sitemap: https://kravlone.xyz/sitemap.xml
+Sitemap: https://blog.kravlone.xyz/sitemap.xml
