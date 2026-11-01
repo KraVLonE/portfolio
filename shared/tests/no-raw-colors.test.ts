@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 
 const ROOT = resolve(__dirname, '../..');
 // Add new UI directories here as they are created.
-const GUARDED = ['shared/ui', 'shared/markdown', 'web-blog/src', 'admin-portfolio/src/pages/blog'];
+const GUARDED = ['shared/ui', 'shared/markdown', 'web-blog/src', 'admin-portfolio/src/pages/blog', 'web-portfolio/src/blog'];
 
 const PALETTE =
   'slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose';

@@ -47,6 +47,16 @@ services:
     depends_on:
       - backend
 
+  blog:
+    build:
+      context: .
+      dockerfile: web-blog/Dockerfile
+    restart: always
+    depends_on:
+      - backend
+    volumes:
+      - blog_media:/usr/share/nginx/media:ro
+
 volumes:
   postgres_data:
   blog_media:

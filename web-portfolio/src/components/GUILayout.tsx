@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useMode } from '../context/ModeContext';
-import { Terminal, Download, Mail, ExternalLink, GitBranch, Copy, Check } from 'lucide-react';
+import { Terminal, Download, Mail, ExternalLink, GitBranch, Copy, Check, PenLine } from 'lucide-react';
 import { GithubIcon } from './icons';
-import { fetchProfile, fetchExperience, fetchProjects, fetchSkills, fetchGithubStats, fetchAchievements } from '../api';
+import { fetchProfile, fetchExperience, fetchProjects, fetchSkills, fetchGithubStats, fetchAchievements, fetchLatestPosts } from '../api';
+import { LatestPosts, type LatestPost } from '../blog/LatestPosts';
+import { BLOG_URL } from '../blog/config';
 import { CommandPalette } from './CommandPalette';
 import { FadeIn } from './FadeIn';
 import { Typewriter } from './Typewriter';
@@ -16,6 +18,7 @@ const GUILayout: React.FC = () => {
   const [skills, setSkills] = useState<any[]>([]);
   const [achievements, setAchievements] = useState<any[]>([]);
   const [githubStats, setGithubStats] = useState<any>(null);
+  const [latestPosts, setLatestPosts] = useState<LatestPost[]>([]);
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [npxCopied, setNpxCopied] = useState(false);
 
@@ -27,8 +30,9 @@ const GUILayout: React.FC = () => {
       fetchProjects().catch(() => []),
       fetchSkills().catch(() => []),
       fetchGithubStats().catch(() => null),
-      fetchAchievements().catch(() => [])
-    ]).then(([p, e, pr, s, gh, ach]) => {
+      fetchAchievements().catch(() => []),
+      fetchLatestPosts().catch(() => [])
+    ]).then(([p, e, pr, s, gh, ach, posts]) => {
       if (cancelled) return;
       setProfile(p);
       setExperience(e);
@@ -36,6 +40,7 @@ const GUILayout: React.FC = () => {
       setSkills(s);
       setGithubStats(gh);
       setAchievements(ach);
+      setLatestPosts(posts);
     });
     return () => { cancelled = true; };
   }, []);
@@ -52,6 +57,9 @@ const GUILayout: React.FC = () => {
       <nav className="fixed top-0 w-full p-4 flex justify-between items-center bg-slate-950/80 backdrop-blur-md z-50 border-b border-cyan-500/20">
         <div className="text-xl font-bold tracking-tight text-white">{profile?.name}</div>
         <div className="flex items-center gap-4">
+          <a href={BLOG_URL} className="flex items-center gap-1.5 text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors">
+            <PenLine size={16} className="text-cyan-400" /> Blog
+          </a>
           <span className="hidden md:inline-flex text-xs px-2 py-1 bg-slate-900 text-cyan-400 rounded-sm border border-cyan-500/20 font-mono tracking-widest">Cmd + K</span>
           <button
             onClick={toggleMode}
@@ -196,6 +204,8 @@ const GUILayout: React.FC = () => {
           )}
         </section>
         </FadeIn>
+
+        <LatestPosts posts={latestPosts} />
 
         {/* Skills Section */}
         <FadeIn>

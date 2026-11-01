@@ -46,6 +46,7 @@ Design rules: [docs/DESIGN.md](./docs/DESIGN.md). Frontend Docker images build f
 ### 5. Access the App Locally
 - **Portfolio Frontend:** [http://localhost:8082](http://localhost:8082)
 - **Admin Panel:** [http://localhost:8081](http://localhost:8081)
+- **Blog:** [http://localhost:8083](http://localhost:8083) (dev server: `npm run dev -w web-blog` → :5175)
 - **Backend API & Docs:** [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
 
 ---
@@ -63,6 +64,8 @@ Once Traefik is running, clone this repo on your EC2 instance, configure your `.
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 ```
+Before the first blog deploy, add a DNS **A record `blog` → EC2 IP** (Traefik then issues its certificate).
+
 Traefik will instantly detect your containers, fetch SSL certificates, and route `kravlone.xyz` to your portfolio and `admin.kravlone.xyz` to your admin panel!
 
 ---

@@ -1,7 +1,12 @@
 {
   "name": "portfolio",
   "private": true,
-  "workspaces": ["shared", "web-portfolio", "admin-portfolio"],
+  "workspaces": [
+    "shared",
+    "web-portfolio",
+    "admin-portfolio",
+    "web-blog"
+  ],
   "scripts": {
     "test": "make test"
   }

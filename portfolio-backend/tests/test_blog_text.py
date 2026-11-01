@@ -58,3 +58,8 @@ def test_plain_text_unescapes_entities():
 def test_count_links():
     assert count_links("see https://a.com and http://b.com, www.c.com") == 3
     assert count_links("no links here") == 0
+
+
+def test_plain_text_inline_markup_adds_no_spaces():
+    md = "I wired **retrieval**, *routing* and `tools`. See [docs](https://x).\n\n## Next\n\nMore"
+    assert plain_text(md) == "I wired retrieval, routing and tools. See docs. Next More"

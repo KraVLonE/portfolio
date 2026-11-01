@@ -15,6 +15,7 @@ EXCERPT_LEN = 160
 _md = MarkdownIt("commonmark", {"html": False, "linkify": False}).enable(["table", "strikethrough"])
 
 _PRE_RE = re.compile(r"<pre>.*?</pre>", re.S)
+_BLOCK_TAG_RE = re.compile(r"</?(?:p|h[1-6]|li|ul|ol|blockquote|pre|tr|td|th|table|hr|br|div)\b[^>]*>", re.I)
 _TAG_RE = re.compile(r"<[^>]+>")
 _WS_RE = re.compile(r"\s+")
 
@@ -34,7 +35,9 @@ def plain_text(md: str, include_code: bool = True) -> str:
     html = render_markdown(md)
     if not include_code:
         html = _PRE_RE.sub(" ", html)
-    return _WS_RE.sub(" ", unescape(_TAG_RE.sub(" ", html))).strip()
+    # Block tags separate words; inline tags (<strong>, <a>, <code>) must not add spaces before punctuation.
+    text = _TAG_RE.sub("", _BLOCK_TAG_RE.sub(" ", html))
+    return _WS_RE.sub(" ", unescape(text)).strip()
 
 
 def make_excerpt(md: str, limit: int = EXCERPT_LEN) -> str:

@@ -31,7 +31,7 @@ Read this before any UI change. Source of truth: `shared/theme.css` (tokens) and
 ## Type & motifs
 
 - Body: Tailwind default sans. Labels, tags, code, metadata: `font-mono`.
-- Section label motif: `// LABEL` in mono, `text-[10px] uppercase tracking-[0.2em] text-subtle` (built into `SectionHeading`).
+- Section label motif: `Title // LABEL`, label inline in neon mono (built into `SectionHeading`). Small `// label` captions above blocks (e.g. `// contents`) use `text-[10px] uppercase tracking-[0.2em] text-subtle`.
 - Brand gradient for one hero word per page max: `text-transparent bg-clip-text bg-gradient-to-r from-neon to-accent`.
 - Radii: `rounded-md` for controls/tags, `rounded-lg` for cards.
 - Focus: always visible, `outline-neon` (primitives handle it).

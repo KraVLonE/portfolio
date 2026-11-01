@@ -50,7 +50,7 @@ describe('SectionHeading', () => {
   it('renders the // label and the requested heading level', () => {
     render(<SectionHeading label="writing" as="h1">Blog</SectionHeading>);
     expect(screen.getByText('// writing')).toBeTruthy();
-    expect(screen.getByRole('heading', { level: 1, name: 'Blog' })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1, name: 'Blog // writing' })).toBeTruthy();
   });
 });
 
