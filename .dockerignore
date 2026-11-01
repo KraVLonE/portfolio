@@ -1,0 +1,8 @@
+# Root build context (frontends). Backend builds from its own folder.
+**/node_modules
+**/dist
+.git
+portfolio-backend
+krav-card
+docs
+**/.env.local

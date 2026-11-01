@@ -35,7 +35,15 @@ docker compose up --build -d
 ```
 *(Docker will automatically run database migrations on startup).*
 
-### 4. Access the App Locally
+### 4. Frontend dev & tests
+The frontends + `shared/` (design tokens & UI primitives) are **npm workspaces** — install once at the repo root:
+```bash
+npm install            # never inside web-portfolio/ or admin-portfolio/
+make test              # backend pytest (auto-starts a throwaway Postgres on :5433) + shared UI tests + typecheck/lint/build
+```
+Design rules: [docs/DESIGN.md](./docs/DESIGN.md). Frontend Docker images build from the repo root context.
+
+### 5. Access the App Locally
 - **Portfolio Frontend:** [http://localhost:8082](http://localhost:8082)
 - **Admin Panel:** [http://localhost:8081](http://localhost:8081)
 - **Backend API & Docs:** [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
