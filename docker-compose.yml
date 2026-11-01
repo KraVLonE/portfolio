@@ -28,6 +28,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      # Blog image uploads (BLG-38). Back this up: see README "Backups".
+      - blog_media:/app/media
 
   admin:
     build:
@@ -46,4 +49,5 @@ services:
 
 volumes:
   postgres_data:
+  blog_media:
 

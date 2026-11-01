@@ -4,7 +4,7 @@ import pytest
 from app.main import app
 
 # Public write endpoints that intentionally need no admin token.
-PUBLIC_WRITES = {"/api/contact", "/api/chat", "/api/admin/login"}
+PUBLIC_WRITES = {"/api/contact", "/api/chat", "/api/admin/login", "/api/blog/posts/{slug}/comments"}
 WRITE_METHODS = {"post", "put", "patch", "delete"}
 
 

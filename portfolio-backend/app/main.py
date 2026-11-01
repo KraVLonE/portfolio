@@ -42,10 +42,13 @@ app.add_middleware(
         "https://kravlone.xyz",
         "https://www.kravlone.xyz",
         "https://admin.kravlone.xyz",
+        "https://blog.kravlone.xyz",
         "http://localhost:5173",
         "http://localhost:5174",
         "http://localhost:8081",
         "http://localhost:8082",
+        "http://localhost:8083",
+        "http://localhost:5175",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -76,3 +79,9 @@ from app.api.seo import router as seo_router
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.include_router(seo_router, prefix=settings.API_V1_STR)
+
+from app.api.blog import router as blog_router
+from app.api.blog_admin import router as blog_admin_router
+
+app.include_router(blog_router, prefix=settings.API_V1_STR)
+app.include_router(blog_admin_router, prefix=settings.API_V1_STR)

@@ -9,3 +9,4 @@ from app.models.domain import (
     ChatLog,
     Achievement
 )
+from app.models.blog import BlogTag, BlogPost, BlogSlugRedirect, BlogComment, BlogImage, blog_post_tags
