@@ -8,6 +8,7 @@
 
 /* Let Tailwind see class names used inside shared components. */
 @source "./ui";
+@source "./markdown";
 
 @theme inline {
   /* Surfaces */

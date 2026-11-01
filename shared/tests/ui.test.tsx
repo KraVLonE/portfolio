@@ -83,3 +83,11 @@ describe('Card', () => {
     expect(live.className).toContain('hover:shadow-glow');
   });
 });
+
+describe('buttonClass', () => {
+  it('gives links the same look as Button', async () => {
+    const { buttonClass } = await import('../ui');
+    render(<><a href="/x" className={buttonClass('ghost', 'sm')}>link</a><Button variant="ghost" size="sm">btn</Button></>);
+    expect(screen.getByText('link').className).toBe(screen.getByRole('button').className);
+  });
+});

@@ -200,3 +200,7 @@ One entry point: `make test` at repo root runs everything. Optional later: Playw
 | L11 | 2026-11-02 | Image "in use" = its filename appears in any post's Markdown or cover URL | No join table to keep in sync; filenames are UUIDs so no false matches |
 | L12 | 2026-11-02 | Image URLs stored absolute (`BLOG_MEDIA_BASE_URL`); local dev blog app will run on port 8083 | Works in admin preview (different origin) and RSS |
 | L13 | 2026-11-02 | IP hash = HMAC-SHA256 keyed with `SECRET_KEY` | Plain SHA-256 of an IPv4 is brute-forceable in minutes |
+| L14 | 2026-11-02 | Admin sidebar collapses behind a menu button below `md` (layout-only change to `App.tsx`) | Fixed 256 px sidebar left ~130 px on phones; BLG-31 requires a usable editor on small screens |
+| L15 | 2026-11-02 | Comments render through `CommentBody` (bold/italic/code/links only; links get `rel="nofollow ugc noopener noreferrer"`); bare URLs are not auto-linked | BLG-40 + no SEO value for spam links |
+| L16 | 2026-11-02 | Images whose URL is stripped as unsafe render `[image: alt]` instead of `<img src="">` | Empty `src` makes browsers re-request the page |
+| L17 | 2026-11-02 | Unsaved-changes guard = local autosave + confirm on in-app link clicks + `beforeunload` (no router migration) | `useBlocker` needs a data router; migrating the admin router would be an unrequested refactor |

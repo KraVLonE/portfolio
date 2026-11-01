@@ -1,4 +1,4 @@
-# Run before every commit: backend tests + shared UI tests + frontend typecheck/lint/build.
+# Run before every commit: backend tests + shared/admin UI tests + frontend typecheck/lint/build.
 # First time: `npm install` at repo root (npm workspaces).
 .PHONY: test test-backend test-shared test-web test-admin
 
@@ -14,4 +14,4 @@ test-web:
 	cd web-portfolio && npx tsc -b && npm run lint && npm run build
 
 test-admin:
-	cd admin-portfolio && npx tsc -b && npm run lint && npm run build
+	cd admin-portfolio && npx tsc -b && npm run lint && npm test && npm run build
