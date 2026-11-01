@@ -4,7 +4,6 @@ import { useMode } from '../context/ModeContext';
 import { fetchProfile, fetchExperience, fetchProjects, fetchSkills, fetchAchievements } from '../api';
 import { VirtualFileSystem } from './vfs';
 import { API_URL } from '../api';
-import type { VFSNode } from './vfs';
 import { Loader2 } from 'lucide-react';
 
 // Levenshtein distance for "did you mean"
@@ -222,8 +221,8 @@ const CLILayout: React.FC = () => {
                 body: JSON.stringify({ 
                   message: msg,
                   history: history
-                    .filter(h => h.command.startsWith('chat '))
-                    .map(h => ({ role: 'user', content: h.command.replace('chat ', '') }))
+                    .filter(h => h.command?.startsWith('chat '))
+                    .map(h => ({ role: 'user', content: (h.command ?? '').replace('chat ', '') }))
                     .slice(-5) 
                 })
               });

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useMode } from '../context/ModeContext';
-import { Terminal, Code, Briefcase, FileText, Mail, GitBranch, Download } from 'lucide-react';
+import { Terminal, Code, Briefcase, Mail, GitBranch, Download } from 'lucide-react';
 
 export const CommandPalette: React.FC<{ profile: any }> = ({ profile }) => {
   const [isOpen, setIsOpen] = useState(false);

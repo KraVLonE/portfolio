@@ -49,7 +49,7 @@ export class VirtualFileSystem {
 
   private buildExperienceNodes(experiences: any[]) {
     const nodes: Record<string, VFSNode> = {};
-    experiences.forEach((exp, i) => {
+    experiences.forEach((exp) => {
       const filename = `${exp.company.toLowerCase().replace(/[^a-z0-9]/g, '-')}.md`;
       nodes[filename] = {
         type: 'file',
@@ -62,7 +62,7 @@ export class VirtualFileSystem {
 
   private buildProjectNodes(projects: any[]) {
     const nodes: Record<string, VFSNode> = {};
-    projects.forEach((proj, i) => {
+    projects.forEach((proj) => {
       const filename = `${proj.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}.md`;
       nodes[filename] = {
         type: 'file',
