@@ -21,9 +21,9 @@ Read this before any UI change. Source of truth: `shared/theme.css` (tokens) and
 | `fg` | `text-fg` | slate-300 | Body text |
 | `fg-strong` | `text-fg-strong` | white | Headings, emphasis, button text |
 | `muted` | `text-muted` | slate-400 | Secondary text, metadata |
-| `subtle` | `text-subtle` | slate-500 | Labels, placeholders, `// LABEL` |
+| `subtle` | `text-subtle` | slate-500/400 mix | Labels, placeholders, captions (≥ 4.5:1 on `bg`/`surface`) |
 | `neon` | `text-neon`, `border-neon/50` | cyan-400 | Links, focus, active state, brand |
-| `neon-strong` / `neon-deep` | `bg-neon-deep hover:bg-neon-strong` | cyan-500 / 600 | Primary button fill |
+| `neon-strong` / `neon-deep` | `bg-neon-deep hover:bg-neon-strong` | cyan-600 / 700 | Primary button (white text ≥ 4.5:1) |
 | `accent` / `accent-soft` | `text-accent-soft`, `from-neon to-accent` | pink-500 / 400 | Secondary highlight, destructive-ish actions |
 | `success` / `warning` / `danger` | `text-danger` | emerald-400 / amber-400 / rose-500 | Status, form errors |
 | `shadow-glow` / `-strong` / `-accent` | `hover:shadow-glow` | cyan/pink glow | Interactive hover, active chips |
@@ -65,4 +65,5 @@ Prose and syntax-highlight colours live in `shared/markdown/markdown.css` and us
 - [ ] Only tokens/primitives (guard test passes)
 - [ ] Looks right at 360 px and desktop
 - [ ] Keyboard: tab order sensible, focus visible
+- [ ] Contrast: new colour pairs ≥ 4.5:1 for text (check with axe or browser devtools)
 - [ ] `make test` green

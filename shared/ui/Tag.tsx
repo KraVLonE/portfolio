@@ -15,11 +15,13 @@ export interface TagButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> 
 }
 
 /** Toggleable filter chip. Exposes state via aria-pressed. */
-export function TagButton({ active = false, type = 'button', className, ...rest }: TagButtonProps) {
+export function TagButton({ active = false, type = 'button', className, role, ...rest }: TagButtonProps) {
+  // Toggle buttons expose aria-pressed; when used as a tab the caller sets role + aria-selected instead.
   return (
     <button
       type={type}
-      aria-pressed={active}
+      role={role}
+      aria-pressed={role && role !== 'button' ? undefined : active}
       className={cn(
         BASE,
         'cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-neon',

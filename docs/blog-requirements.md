@@ -1,6 +1,6 @@
-# Blog System — Requirements (v0.2)
+# Blog System — Requirements (v1.0)
 
-Status: **approved** (v0.2: images hosted on EC2, blog on `blog.kravlone.xyz`) · Owner: kravlone · Date: 2026-11-02
+Status: **implemented** — all phases complete; deploy steps in [DEPLOY-blog.md](./DEPLOY-blog.md). (v0.2: images on EC2, blog on `blog.kravlone.xyz`) · Owner: kravlone · Date: 2026-11-02
 
 Requirement IDs (`BLG-xx`) are referenced by tests and commits. **Nothing outside this doc gets built without updating the doc first.**
 
@@ -208,3 +208,41 @@ One entry point: `make test` at repo root runs everything. Optional later: Playw
 | L19 | 2026-11-02 | Post page (Markdown + highlight.js) is lazy-loaded; blog list doesn't download it | NFR-04 spirit: list page stays light (~97 KB gz vs ~206 KB with post chunk) |
 | L20 | 2026-11-02 | `/media` served by blog nginx with immutable caching, `nosniff` and a sandboxing CSP | UUID filenames never change; CSP stops a mis-typed upload from running script on the blog origin |
 | L21 | 2026-11-02 | Main site's `VITE_BLOG_URL` defaults to `https://blog.kravlone.xyz` even in local docker | Avoids per-env build args; set `VITE_BLOG_URL=http://localhost:8083` in `web-portfolio/.env.local` for local dev |
+| L22 | 2026-11-02 | Blog SEO pages: `404` status + `noindex` shell for drafts/unknown slugs; `301` for old slugs; backend failure falls back to the static SPA shell | Correct HTTP semantics for crawlers without ever breaking the site for humans |
+| L23 | 2026-11-02 | JSON-LD escapes `<` as `\u003c` | A post title containing `</script>` can't break out of the structured-data block |
+| L24 | 2026-11-02 | Blog `robots.txt` does not block `/media/` | X/LinkedIn crawlers obey robots.txt; blocking media would kill cover-image previews |
+| L25 | 2026-11-02 | CLI `~/blog`: file list loaded with the CLI (≤50 posts); each post's Markdown fetched on first `cat` and cached; new `open <post>` command | Avoids N requests up front; matches existing VFS behaviour |
+| L26 | 2026-11-02 | Main-site SEO homepage links the 3 latest posts | Lets crawlers discover the blog subdomain from the main domain |
+| L27 | 2026-11-02 | **Bug fix:** setext headings disabled (SPA + server): `---` under text is always a horizontal rule; headings only via `#` | Owner report: text between `---` lines rendered as a heading |
+| L28 | 2026-11-02 | **Bug fix:** single newline = line break (`remark-breaks`, markdown-it `breaks`), also in comments | Owner report; GitHub-comment style is what authors expect |
+| L29 | 2026-11-02 | **Bug fix:** paragraphs with ≥2 box-drawing lines (text trees) are auto-wrapped in a code fence before parsing (SPA + server) | Owner report; Markdown strips leading spaces in paragraphs, so CSS alone can't keep tree indentation |
+| L30 | 2026-11-02 | **Bug fix (flicker):** server embeds page data (`<script id="blog-data">`), client cache + stale-while-revalidate, previous list kept (dimmed) on filter switch, post data prefetched on hover/focus, post chunk preloaded | Owner report. Measured in Chromium with 250 ms API latency: list skeleton flashes 4→0 (refresh), 2→0 (filter), 5→0 (back); CLS 0.103→0 |
+| L31 | 2026-11-02 | Post cards show the cover image as a right-side thumbnail (fixed size → no layout shift); compact related cards stay text-only | Owner request |
+
+## 11. Pre-existing issue found — **FIXED** (unused router removed, constant-time token compare, tests in `portfolio-backend/tests/test_admin_auth.py`)
+
+`portfolio-backend/app/api/admin_endpoints.py` → `get_current_user()` is a `TODO` that returns admin for **any** request, so `PUT /api/admin/profile` and the other routes in that file are effectively **unauthenticated**. Also `verify_admin_token` uses `!=` instead of a constant-time compare. Suggested: delete the unused router (the admin UI uses `endpoints.py` + `x-admin-token`) or protect it with `verify_admin_token`. ~10-line fix + test.
+
+## 12. Delivery phases
+
+1. ✅ Test harness + characterization tests + §11 fix
+2. ✅ Shared tokens/primitives + DESIGN.md
+3. ✅ Backend: models, migration, endpoints, tests
+4. ✅ Admin: post editor, image upload, tag manager, comment moderation
+5. ✅ `web-blog` app: list, post page, comments; main-site Blog link + Latest posts; Traefik/compose wiring
+6. ✅ SEO/RSS/sitemap, CLI `~/blog`
+7. ✅ Final pass: full test run, traceability, axe a11y scan, bundle budget, smoke script, deploy checklist
+
+Each phase ends green (tests + lint + build) and is a separate commit when you ask.
+
+## 13. Verification summary (phase 7, 2026-11-02)
+
+| Check | Result |
+|---|---|
+| `make test` | backend 128 · shared 84 · admin 32 · main site 7 · blog 30 = **281 tests green**; typecheck, lint, build for all apps |
+| Traceability | Every BLG/NFR ID has an automated test, except BLG-38 (nginx media headers) and BLG-53 (responsive) → covered by `scripts/smoke.sh` and Playwright overflow checks at 360 px; NFR-06 → every test run does `alembic downgrade base` → `upgrade head` |
+| Mutation checks | Key protections deliberately broken (scheduled visibility, slug redirect, honeypot, SVG sniffing, pre-moderation, skipHtml, rel=noreferrer, JSON-LD escaping, tag noindex) → each caught by a failing test |
+| NFR-04 bundle | Homepage JS+CSS gzip: 141.57 KB → 152.65 KB (**+11.1 KB**, budget 15 KB). Post page (Markdown/highlight) is a separate lazy chunk |
+| NFR-05 a11y | axe-core WCAG 2.1 A/AA on 10 pages (blog index/post/404, homepage section, 5 admin screens) → **0 violations** after fixes (subtle-text and primary-button contrast tokens, focusable scroll regions, ARIA on tab chips, underlined inline link) |
+| Flicker (owner report) | List skeleton flashes 4/2/5 → 0/0/0 (refresh/filter/back), CLS 0.103 → 0 |
+| Real stack | E2E through admin UI → backend → blog nginx; `scripts/smoke.sh` 17/17 against local docker |

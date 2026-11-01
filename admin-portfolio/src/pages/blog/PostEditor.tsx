@@ -334,7 +334,7 @@ export default function PostEditor() {
         <div className="md:col-span-2">
           <p className="mb-1.5 font-mono text-xs uppercase tracking-wider text-muted">
             Tags <span className="text-subtle">({form.tags.length}/{MAX_TAGS})</span>
-            <Link to="/blog/tags" className="ml-3 normal-case tracking-normal text-neon hover:underline">manage</Link>
+            <Link to="/blog/tags" className="ml-3 normal-case tracking-normal text-neon underline underline-offset-2">manage</Link>
           </p>
           <div className="flex flex-wrap gap-2" role="group" aria-label="Tags">
             {allTags.length === 0 && <span className="font-mono text-xs text-subtle">No tags yet.</span>}
