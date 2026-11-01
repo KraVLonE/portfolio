@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: Optional[str] = None
     NOTIFICATION_EMAIL: Optional[str] = None
 
+    # Blog (docs/blog-requirements.md)
+    BLOG_MEDIA_DIR: str = "/app/media"  # docker volume, also mounted read-only into blog nginx
+    BLOG_MEDIA_BASE_URL: str = "https://blog.kravlone.xyz/media"  # absolute so admin preview + RSS work
+    BLOG_MAX_IMAGE_BYTES: int = 5 * 1024 * 1024
+
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
 settings = Settings()

@@ -193,19 +193,10 @@ One entry point: `make test` at repo root runs everything. Optional later: Playw
 | L4 | 2026-11-02 | Fixed 12 pre-existing TypeScript errors in `web-portfolio` (unused imports, type-only imports, literal types) | `build` never type-checked; a permanently red check is useless. Type-only, no behaviour change |
 | L5 | 2026-11-02 | `shared/` is an npm workspace package `@kravlone/shared`; single root `package-lock.json` replaces per-app lockfiles; admin package renamed `admin-portfolio` (was a duplicate `web-portfolio`) | Only reliable way for shared React components to resolve `react` from one place |
 | L6 | 2026-11-02 | Tokens map onto the existing palette (no visual change to current pages); guard test also bans raw Tailwind palette classes in new code | Consistency without a redesign |
-
-## 11. Pre-existing issue found — **FIXED** (unused router removed, constant-time token compare, tests in `portfolio-backend/tests/test_admin_auth.py`)
-
-`portfolio-backend/app/api/admin_endpoints.py` → `get_current_user()` is a `TODO` that returns admin for **any** request, so `PUT /api/admin/profile` and the other routes in that file are effectively **unauthenticated**. Also `verify_admin_token` uses `!=` instead of a constant-time compare. Suggested: delete the unused router (the admin UI uses `endpoints.py` + `x-admin-token`) or protect it with `verify_admin_token`. ~10-line fix + test.
-
-## 12. Delivery phases
-
-1. ✅ Test harness + characterization tests + §11 fix
-2. ✅ Shared tokens/primitives + DESIGN.md
-3. Backend: models, migration, endpoints, tests
-4. Admin: post editor, image upload, tag manager, comment moderation
-5. `web-blog` app: list, post page, comments; main-site Blog link + Latest posts; Traefik/compose wiring
-6. SEO/RSS/sitemap, CLI `~/blog`
-7. Final pass: full test run, manual check at mobile/desktop
-
-Each phase ends green (tests + lint + build) and is a separate commit when you ask.
+| L7 | 2026-11-02 | Honeypot / too-fast (<3 s) comments get the same `202` as real ones but are not stored | Bots can't tell they were caught, so they don't adapt |
+| L8 | 2026-11-02 | Display names `kravlone`, `admin`, `author`, `moderator` are reserved (422) | Stops visitors impersonating the author badge (BLG-46) |
+| L9 | 2026-11-02 | Related posts (BLG-13) only include posts sharing ≥1 tag; no "newest" filler | A post with nothing in common isn't "related" |
+| L10 | 2026-11-02 | Publish accepts optional `published_at` (scheduling); unpublish keeps the original date | BLG-03 already implies `published_at ≤ now`; BLG-05 keeps first-publish date |
+| L11 | 2026-11-02 | Image "in use" = its filename appears in any post's Markdown or cover URL | No join table to keep in sync; filenames are UUIDs so no false matches |
+| L12 | 2026-11-02 | Image URLs stored absolute (`BLOG_MEDIA_BASE_URL`); local dev blog app will run on port 8083 | Works in admin preview (different origin) and RSS |
+| L13 | 2026-11-02 | IP hash = HMAC-SHA256 keyed with `SECRET_KEY` | Plain SHA-256 of an IPv4 is brute-forceable in minutes |

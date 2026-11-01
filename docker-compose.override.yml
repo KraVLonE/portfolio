@@ -4,6 +4,8 @@ services:
   backend:
     ports:
       - "8000:8000"
+    environment:
+      BLOG_MEDIA_BASE_URL: http://localhost:8083/media
 
   admin:
     ports:

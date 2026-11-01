@@ -67,6 +67,15 @@ Traefik will instantly detect your containers, fetch SSL certificates, and route
 
 ---
 
+## 💾 Backups (blog images)
+Blog images live in the `blog_media` Docker volume on the EC2 host. Back them up with the database, e.g. a daily cron job:
+```bash
+docker run --rm -v portfolio_blog_media:/media:ro -v ~/backups:/out alpine \
+  tar czf /out/blog-media-$(date +%F).tgz -C /media .
+# optional: aws s3 cp ~/backups/blog-media-$(date +%F).tgz s3://<bucket>/
+```
+Restore: `docker run --rm -v portfolio_blog_media:/media -v ~/backups:/in alpine tar xzf /in/<file>.tgz -C /media`
+
 ## 🧹 Useful Maintenance Commands
 
 - **View Live Logs:** 
