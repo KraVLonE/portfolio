@@ -1,0 +1,8 @@
+{
+  "name": "portfolio",
+  "private": true,
+  "workspaces": ["shared", "web-portfolio", "admin-portfolio"],
+  "scripts": {
+    "test": "make test"
+  }
+}

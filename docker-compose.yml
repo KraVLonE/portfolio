@@ -31,13 +31,15 @@ services:
 
   admin:
     build:
-      context: ./admin-portfolio
+      context: .
+      dockerfile: admin-portfolio/Dockerfile
     depends_on:
       - backend
 
   frontend:
     build:
-      context: ./web-portfolio
+      context: .
+      dockerfile: web-portfolio/Dockerfile
     restart: always
     depends_on:
       - backend
