@@ -48,6 +48,18 @@ import { Button, Card, SectionHeading, Tag, TagButton, Input, Textarea } from '@
 <Input label="Title" error={errors.title} />                       {/* label + aria wired */}
 ```
 
+Links that should look like buttons: `<Link className={buttonClass('primary', 'sm')}>` — never nest `<button>` inside `<a>`.
+
+## Markdown
+
+```tsx
+import { MarkdownRenderer, CommentBody, extractToc, shouldShowToc } from '@kravlone/shared/markdown';
+// app CSS:  @import "@kravlone/shared/markdown.css";
+<MarkdownRenderer markdown={post.content_md} />   // posts + admin preview (same component = preview is exact)
+<CommentBody markdown={comment.body} />           // comments: bold/italic/code/links only
+```
+Prose and syntax-highlight colours live in `shared/markdown/markdown.css` and use tokens via `@apply`.
+
 ## Checklist for a UI change
 
 - [ ] Only tokens/primitives (guard test passes)
