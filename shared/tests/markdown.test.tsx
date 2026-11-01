@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { MarkdownRenderer, extractToc, shouldShowToc } from '../markdown';
+import { MarkdownRenderer, extractToc, fenceTextTrees, shouldShowToc } from '../markdown';
 
 afterEach(cleanup);
 
@@ -77,6 +77,12 @@ describe('BLG-21 code blocks', () => {
     expect(c.textContent).toContain('[image: diagram]');
   });
 
+  it('scrollable code blocks and tables are keyboard-focusable', () => {
+    const c = html('```\nx\n```\n\n| a |\n|---|\n| 1 |');
+    expect(c.querySelector('pre')?.getAttribute('tabindex')).toBe('0');
+    expect(c.querySelector('[role="region"][aria-label="Table"]')?.getAttribute('tabindex')).toBe('0');
+  });
+
   it('images are lazy and always have alt', () => {
     const img = html('![](https://x/y.png)').querySelector('img')!;
     expect(img.getAttribute('loading')).toBe('lazy');
@@ -114,5 +120,62 @@ describe('BLG-23 table of contents', () => {
   it('only shows for ≥3 h2 sections', () => {
     expect(shouldShowToc(extractToc('## a\n\n## b'))).toBe(false);
     expect(shouldShowToc(extractToc('## a\n\n## b\n\n### c\n\n## d'))).toBe(true);
+  });
+});
+
+describe('reported bugs (2026-11-02)', () => {
+  const tree = 'notes/\n├── daily/\n│   └── 2026-11-02.md\n└── reference/';
+
+  it('`---` under text is a rule, never a heading', () => {
+    const c = html('Some intro text\n---\n\nmore');
+    expect(c.querySelector('h1, h2')).toBeNull();
+    expect(c.querySelector('hr')).not.toBeNull();
+    expect(c.querySelector('p')?.textContent).toBe('Some intro text');
+  });
+
+  it('text between --- lines stays a paragraph between rules', () => {
+    const c = html('---\ntitle: hello\n---\n\nbody');
+    expect(c.querySelector('h1, h2')).toBeNull();
+    expect(c.querySelectorAll('hr')).toHaveLength(2);
+    expect(c.textContent).toContain('title: hello');
+  });
+
+  it('`#` headings still work and === under text is not a heading', () => {
+    const c = html('# Real\n\nnot\n===');
+    expect(c.querySelector('h1')?.textContent).toBe('Real');
+    expect(c.querySelectorAll('h1')).toHaveLength(1);
+  });
+
+  it('single newline renders as a line break', () => {
+    const p = html('line one\nline two').querySelector('p')!;
+    expect(p.querySelectorAll('br')).toHaveLength(1);
+    expect(p.textContent).toBe('line one\nline two');
+  });
+
+  it('unfenced text tree renders exactly like a fenced one (indent kept)', () => {
+    const t = tree + '\n    └── git.md';
+    const c = html('Intro:\n\n' + t + '\n\nAfter.');
+    expect(c.querySelector('pre code')?.textContent).toBe(t + '\n');
+    expect(c.querySelectorAll('p')).toHaveLength(2);
+  });
+
+  it('fenced tree is untouched', () => {
+    expect(html('```\n' + tree + '\n```').querySelector('pre code')?.textContent).toBe(tree + '\n');
+  });
+
+  it('fenceTextTrees: only multi-line box-drawing paragraphs, never inside fences', () => {
+    expect(fenceTextTrees('a single ─ dash line')).toBe('a single ─ dash line');
+    expect(fenceTextTrees('├── a\n└── b')).toBe('```text\n├── a\n└── b\n```');
+    const fenced = '```\n├── a\n└── b\n```';
+    expect(fenceTextTrees(fenced)).toBe(fenced);
+    const tilde = '~~~~\n```\n├── a\n└── b\n~~~~';
+    expect(fenceTextTrees(tilde)).toBe(tilde);
+  });
+
+  it('TOC ignores --- underlined text', () => {
+    expect(extractToc('Intro\n---\n\n## A\n\n## B')).toEqual([
+      { id: 'a', text: 'A', depth: 2 },
+      { id: 'b', text: 'B', depth: 2 },
+    ]);
   });
 });

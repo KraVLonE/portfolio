@@ -31,7 +31,8 @@
 /* fenced code */
 .md-code { @apply relative; }
 .md-code pre {
-  @apply font-mono text-sm leading-6 bg-bg border border-line rounded-lg p-4 overflow-x-auto shadow-glow;
+  @apply font-mono text-sm leading-6 bg-bg border border-line rounded-lg p-4 overflow-x-auto shadow-glow
+    focus-visible:outline-2 focus-visible:outline-neon;
 }
 .md-copy {
   @apply absolute top-2 right-2 font-mono text-[10px] uppercase tracking-widest px-2 py-1 rounded
@@ -41,7 +42,7 @@
 @media (hover: none) { .md-copy { @apply opacity-100; } }
 
 /* tables */
-.md-table { @apply overflow-x-auto rounded-lg border border-line; }
+.md-table { @apply overflow-x-auto rounded-lg border border-line focus-visible:outline-2 focus-visible:outline-neon; }
 .md-table table { @apply w-full text-sm border-collapse; }
 .md-table th { @apply text-left font-mono text-xs uppercase tracking-wider text-muted bg-surface px-4 py-2 border-b border-line; }
 .md-table td { @apply px-4 py-2 border-b border-line; }

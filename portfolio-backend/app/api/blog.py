@@ -21,13 +21,8 @@ MIN_FORM_MS = 3000  # BLG-42: faster than this is a bot
 MAX_LINKS = 2
 
 
-@router.get("/posts", response_model=PostPage)
-async def list_posts(
-    tag: Optional[str] = None,
-    page: int = Query(1, ge=1),
-    per_page: int = Query(10, ge=1, le=50),
-    db: AsyncSession = Depends(get_db),
-):
+async def post_page(db: AsyncSession, tag: Optional[str], page: int, per_page: int = 10) -> PostPage:
+    """Shared by the API and the SEO renderer (which embeds it so the SPA starts with data)."""
     q = svc.visible_posts()
     if tag:
         q = q.where(BlogPost.tags.any(BlogTag.slug == tag.lower()))
@@ -41,6 +36,16 @@ async def list_posts(
         items=[svc.to_summary(p) for p in posts],
         page=page, per_page=per_page, total=total, pages=max(1, math.ceil(total / per_page)),
     )
+
+
+@router.get("/posts", response_model=PostPage)
+async def list_posts(
+    tag: Optional[str] = None,
+    page: int = Query(1, ge=1),
+    per_page: int = Query(10, ge=1, le=50),
+    db: AsyncSession = Depends(get_db),
+):
+    return await post_page(db, tag, page, per_page)
 
 
 async def _visible_post(db: AsyncSession, slug: str) -> Optional[BlogPost]:
@@ -62,6 +67,10 @@ async def get_post(slug: str, db: AsyncSession = Depends(get_db)):
         if target:
             return RedirectResponse(f"{settings.API_V1_STR}/blog/posts/{target}", status_code=301)
         raise HTTPException(status_code=404, detail="Post not found")  # drafts too: don't leak existence
+    return await post_detail(db, post)
+
+
+async def post_detail(db: AsyncSession, post: BlogPost) -> PostDetail:
     related = await svc.related_posts(db, post)
     return PostDetail(
         **svc.to_summary(post).model_dump(exclude={"tags"}),
@@ -75,6 +84,10 @@ async def get_post(slug: str, db: AsyncSession = Depends(get_db)):
 @router.get("/tags", response_model=List[dict])
 async def list_tags(db: AsyncSession = Depends(get_db)):
     """Tags that have at least one visible post, with counts."""
+    return await public_tags(db)
+
+
+async def public_tags(db: AsyncSession) -> list[dict]:
     rows = await db.execute(
         select(BlogTag.slug, BlogTag.name, func.count(BlogPost.id))
         .join(blog_post_tags, blog_post_tags.c.tag_id == BlogTag.id)
