@@ -35,7 +35,7 @@ export const ChatWidget: React.FC = () => {
     if (!input.trim()) return;
 
     const userMessage = input.trim();
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }].slice(-100));
+    setMessages(prev => [...prev, { role: 'user' as const, content: userMessage }].slice(-100));
     setInput('');
     setIsLoading(true);
 
@@ -48,11 +48,11 @@ export const ChatWidget: React.FC = () => {
       
       const data = await res.json();
       if (mountedRef.current) {
-        setMessages(prev => [...prev, { role: 'bot', content: data.reply || "Transmission failed." }].slice(-100));
+        setMessages(prev => [...prev, { role: 'bot' as const, content: data.reply || "Transmission failed." }].slice(-100));
       }
     } catch (err) {
       if (mountedRef.current) {
-        setMessages(prev => [...prev, { role: 'bot', content: "ERROR: Connection to the host was lost." }].slice(-100));
+        setMessages(prev => [...prev, { role: 'bot' as const, content: "ERROR: Connection to the host was lost." }].slice(-100));
       }
     } finally {
       if (mountedRef.current) {

@@ -1,0 +1,43 @@
+/*
+ * Cyberpunk design tokens — single source of truth for colours, fonts and glows.
+ * Import AFTER tailwindcss in each app:   @import "@kravlone/shared/theme.css";
+ * Generates utilities like bg-surface, text-neon, border-line, shadow-glow.
+ * Values mirror the palette already used across the site (slate + cyan + pink).
+ * Rules: docs/DESIGN.md
+ */
+
+/* Let Tailwind see class names used inside shared components. */
+@source "./ui";
+@source "./markdown";
+
+@theme inline {
+  /* Surfaces */
+  --color-bg: var(--color-slate-950);
+  --color-surface: var(--color-slate-900);
+  --color-surface-raised: var(--color-slate-800);
+  --color-line: var(--color-slate-800);
+
+  /* Text */
+  --color-fg: var(--color-slate-300);
+  --color-fg-strong: var(--color-white);
+  --color-muted: var(--color-slate-400);
+  /* between slate-500 and -400: slate-500 fails WCAG AA (4.2:1) on bg/surface */
+  --color-subtle: color-mix(in oklab, var(--color-slate-500) 55%, var(--color-slate-400));
+
+  /* Brand */
+  --color-neon: var(--color-cyan-400);
+  --color-neon-strong: var(--color-cyan-600); /* primary button hover */
+  --color-neon-deep: var(--color-cyan-700);   /* primary button fill: white text ≥ 4.5:1 */
+  --color-accent: var(--color-pink-500);
+  --color-accent-soft: var(--color-pink-400);
+
+  /* Status */
+  --color-success: var(--color-emerald-400);
+  --color-warning: var(--color-amber-400);
+  --color-danger: var(--color-rose-500);
+
+  /* Glows */
+  --shadow-glow: 0 0 10px color-mix(in oklab, var(--color-cyan-500) 20%, transparent);
+  --shadow-glow-strong: 0 0 20px color-mix(in oklab, var(--color-cyan-500) 45%, transparent);
+  --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--color-pink-500) 20%, transparent);
+}

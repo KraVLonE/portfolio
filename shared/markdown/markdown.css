@@ -1,0 +1,66 @@
+/*
+ * Prose + syntax-highlight styles for <MarkdownRenderer>, built only from theme tokens.
+ * Import after the theme:   @import "@kravlone/shared/markdown.css";
+ */
+.md-prose {
+  @apply text-fg leading-relaxed break-words;
+}
+.md-prose > * + * { @apply mt-5; }
+.md-prose h1 { @apply text-3xl font-extrabold text-fg-strong tracking-tight mt-10; }
+.md-prose h2 { @apply text-2xl font-bold text-fg-strong mt-12 pb-2 border-b border-line scroll-mt-24; }
+.md-prose h3 { @apply text-xl font-semibold text-fg-strong mt-8 scroll-mt-24; }
+.md-prose h4 { @apply text-lg font-semibold text-fg-strong mt-6; }
+.md-prose a { @apply text-neon underline decoration-neon/40 underline-offset-2 hover:decoration-neon; }
+.md-prose strong { @apply text-fg-strong font-semibold; }
+.md-prose del { @apply text-subtle; }
+.md-prose ul { @apply list-disc pl-6 space-y-1.5 marker:text-neon; }
+.md-prose ol { @apply list-decimal pl-6 space-y-1.5 marker:text-neon; }
+.md-prose li > ul, .md-prose li > ol { @apply mt-1.5; }
+.md-prose ul.contains-task-list { @apply list-none pl-1; }
+.md-prose input[type="checkbox"] { @apply mr-2 accent-neon; }
+.md-prose blockquote { @apply border-l-2 border-accent pl-4 text-muted italic; }
+.md-prose hr { @apply border-line my-10; }
+.md-prose img { @apply rounded-lg border border-line max-w-full h-auto mx-auto; }
+.md-img-missing { @apply font-mono text-xs text-subtle; }
+
+/* inline code */
+.md-prose :not(pre) > code {
+  @apply font-mono text-[0.875em] px-1.5 py-0.5 rounded bg-surface border border-line text-accent-soft;
+}
+
+/* fenced code */
+.md-code { @apply relative; }
+.md-code pre {
+  @apply font-mono text-sm leading-6 bg-bg border border-line rounded-lg p-4 overflow-x-auto shadow-glow
+    focus-visible:outline-2 focus-visible:outline-neon;
+}
+.md-copy {
+  @apply absolute top-2 right-2 font-mono text-[10px] uppercase tracking-widest px-2 py-1 rounded
+    border border-line bg-surface text-subtle cursor-pointer opacity-0 transition-opacity
+    group-hover:opacity-100 focus-visible:opacity-100 hover:text-neon hover:border-neon/40;
+}
+@media (hover: none) { .md-copy { @apply opacity-100; } }
+
+/* tables */
+.md-table { @apply overflow-x-auto rounded-lg border border-line focus-visible:outline-2 focus-visible:outline-neon; }
+.md-table table { @apply w-full text-sm border-collapse; }
+.md-table th { @apply text-left font-mono text-xs uppercase tracking-wider text-muted bg-surface px-4 py-2 border-b border-line; }
+.md-table td { @apply px-4 py-2 border-b border-line; }
+.md-table tr:last-child td { @apply border-b-0; }
+
+/* highlight.js tokens -> theme */
+.hljs-comment, .hljs-quote { @apply text-subtle italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-built_in, .hljs-meta .hljs-keyword { @apply text-accent-soft; }
+.hljs-string, .hljs-regexp, .hljs-addition, .hljs-attribute { @apply text-success; }
+.hljs-number, .hljs-literal, .hljs-symbol, .hljs-bullet { @apply text-warning; }
+.hljs-title, .hljs-title.function_, .hljs-section, .hljs-name { @apply text-neon; }
+.hljs-type, .hljs-class .hljs-title, .hljs-title.class_ { @apply text-neon-strong; }
+.hljs-variable, .hljs-template-variable, .hljs-params, .hljs-attr, .hljs-property { @apply text-fg; }
+.hljs-meta, .hljs-tag { @apply text-muted; }
+.hljs-deletion { @apply text-danger; }
+.hljs-emphasis { @apply italic; }
+.hljs-strong { @apply font-bold; }
+
+/* comments: compact */
+.md-comment { @apply text-sm; }
+.md-comment > * + * { @apply mt-2; }

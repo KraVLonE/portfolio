@@ -35,9 +35,18 @@ docker compose up --build -d
 ```
 *(Docker will automatically run database migrations on startup).*
 
-### 4. Access the App Locally
+### 4. Frontend dev & tests
+The frontends + `shared/` (design tokens & UI primitives) are **npm workspaces** — install once at the repo root:
+```bash
+npm install            # never inside web-portfolio/ or admin-portfolio/
+make test              # backend pytest (auto-starts a throwaway Postgres on :5433) + shared UI tests + typecheck/lint/build
+```
+Design rules: [docs/DESIGN.md](./docs/DESIGN.md). Frontend Docker images build from the repo root context.
+
+### 5. Access the App Locally
 - **Portfolio Frontend:** [http://localhost:8082](http://localhost:8082)
 - **Admin Panel:** [http://localhost:8081](http://localhost:8081)
+- **Blog:** [http://localhost:8083](http://localhost:8083) (dev server: `npm run dev -w web-blog` → :5175)
 - **Backend API & Docs:** [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
 
 ---
@@ -55,9 +64,20 @@ Once Traefik is running, clone this repo on your EC2 instance, configure your `.
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 ```
+Before the first blog deploy, add a DNS **A record `blog` → EC2 IP** (Traefik then issues its certificate). Full checklist: [docs/DEPLOY-blog.md](./docs/DEPLOY-blog.md); verify with `scripts/smoke.sh https://blog.kravlone.xyz https://kravlone.xyz`.
+
 Traefik will instantly detect your containers, fetch SSL certificates, and route `kravlone.xyz` to your portfolio and `admin.kravlone.xyz` to your admin panel!
 
 ---
+
+## 💾 Backups (blog images)
+Blog images live in the `blog_media` Docker volume on the EC2 host. Back them up with the database, e.g. a daily cron job:
+```bash
+docker run --rm -v portfolio_blog_media:/media:ro -v ~/backups:/out alpine \
+  tar czf /out/blog-media-$(date +%F).tgz -C /media .
+# optional: aws s3 cp ~/backups/blog-media-$(date +%F).tgz s3://<bucket>/
+```
+Restore: `docker run --rm -v portfolio_blog_media:/media -v ~/backups:/in alpine tar xzf /in/<file>.tgz -C /media`
 
 ## 🧹 Useful Maintenance Commands
 

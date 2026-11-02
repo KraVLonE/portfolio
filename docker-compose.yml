@@ -28,20 +28,36 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      # Blog image uploads (BLG-38). Back this up: see README "Backups".
+      - blog_media:/app/media
 
   admin:
     build:
-      context: ./admin-portfolio
+      context: .
+      dockerfile: admin-portfolio/Dockerfile
     depends_on:
       - backend
 
   frontend:
     build:
-      context: ./web-portfolio
+      context: .
+      dockerfile: web-portfolio/Dockerfile
     restart: always
     depends_on:
       - backend
 
+  blog:
+    build:
+      context: .
+      dockerfile: web-blog/Dockerfile
+    restart: always
+    depends_on:
+      - backend
+    volumes:
+      - blog_media:/usr/share/nginx/media:ro
+
 volumes:
   postgres_data:
+  blog_media:
 

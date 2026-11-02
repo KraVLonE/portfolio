@@ -23,8 +23,8 @@ router = APIRouter()
 @router.post("/admin/login")
 @limiter.limit("3/minute")
 async def admin_login(request: Request, body: dict):
-    from app.core.config import settings
-    if body.get("key") == settings.ADMIN_SECRET_KEY:
+    key = body.get("key")
+    if isinstance(key, str) and is_valid_admin_key(key):
         return {"authenticated": True}
     raise HTTPException(status_code=401, detail="Invalid secret key")
 
@@ -128,7 +128,7 @@ async def get_achievements(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Achievement).order_by(Achievement.order))
     return result.scalars().all()
 
-from app.api.auth import verify_admin_token
+from app.api.auth import verify_admin_token, is_valid_admin_key
 from app.schemas import (
     ExperienceCreate, ExperienceUpdate, 
     ProjectCreate, ProjectUpdate, 

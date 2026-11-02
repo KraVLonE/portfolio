@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "@kravlone/shared/theme.css";
+@import "@kravlone/shared/markdown.css";
 
 @layer base {
   body {
