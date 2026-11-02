@@ -19,6 +19,7 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 from app.models.domain import Base
+import app.models.blog  # noqa: F401  (register blog tables for autogenerate)
 target_metadata = Base.metadata
 
 from app.core.config import settings

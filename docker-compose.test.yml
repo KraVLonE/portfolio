@@ -1,0 +1,19 @@
+# Throwaway Postgres for the backend test suite. Data lives in RAM (tmpfs).
+# Usage: docker compose -f docker-compose.test.yml up -d   (or: make -C portfolio-backend test)
+services:
+  test-db:
+    image: postgres:15-alpine
+    container_name: portfolio-test-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: portfolio_test
+    ports:
+      - "5433:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d portfolio_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
