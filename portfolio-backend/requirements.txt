@@ -10,12 +10,7 @@ bcrypt
 python-jose[cryptography]
 slowapi
 apscheduler
-langgraph
-langchain
-langchain-core
-langchain-openai
 greenlet
 python-multipart
-langchain-google-genai
 httpx
 markdown-it-py

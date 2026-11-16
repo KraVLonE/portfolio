@@ -21,8 +21,11 @@ class Settings(BaseSettings):
     # Github stats cache time
     GITHUB_TOKEN: Optional[str] = None
 
-    # Chatbot keys
-    GEMINI_TOKENS: str = ""
+    # Chatbot (DeepSeek)
+    DEEPSEEK_API_KEY: str = ""
+    CHAT_MODEL: str = "deepseek-flash"
+    CHAT_DAILY_LIMIT: int = 300  # max chat messages across all visitors per 24h
+    GEMINI_TOKENS: str = ""  # unused; kept so existing .env files still load
 
     # Email Settings
     SMTP_SERVER: Optional[str] = None

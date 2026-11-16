@@ -88,38 +88,54 @@ from pydantic import BaseModel
 from app.chat.agent import agent
 from app.models.domain import ChatLog
 
-from typing import Dict, Optional
+import logging
+from datetime import timedelta
+from typing import Any, Dict, Optional
+from sqlalchemy import func
+from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 class ChatRequest(BaseModel):
     message: str
-    history: Optional[List[Dict[str, str]]] = None
+    history: Optional[List[Dict[str, Any]]] = None
+
+CHAT_BUSY_REPLY = "I've answered a lot of questions today and need a break. Please try again tomorrow or use the contact form!"
 
 @router.post("/chat", response_model=dict)
-@limiter.limit("5/minute")
+@limiter.limit("5/minute;30/day")
 async def chat_with_agent(request: Request, body: ChatRequest, db: AsyncSession = Depends(get_db)):
     try:
+        # Global daily cap: bounds worst-case LLM spend no matter how many IPs are involved.
+        used_today = await db.scalar(
+            select(func.count()).select_from(ChatLog).where(ChatLog.created_at >= func.now() - timedelta(days=1))
+        )
+        if used_today >= settings.CHAT_DAILY_LIMIT:
+            return {"reply": CHAT_BUSY_REPLY}
+
         result = await agent.ainvoke({"input": body.message, "db": db, "history": body.history or []})
         reply = result.get("final_response", "I encountered an error connecting to my memory banks.")
-        
+
         # Save log
         try:
             log_entry = ChatLog(
-                user_query=body.message,
+                user_query=body.message[:2000],
                 bot_response=reply,
                 intent=result.get("intent", "unknown"),
                 latency_ms=result.get("latency_ms", 0),
                 total_tokens=result.get("total_tokens", 0),
                 retries=result.get("retries", 0),
-                api_key_used=result.get("api_key_used", "none")
+                api_key_used=settings.CHAT_MODEL
             )
             db.add(log_entry)
             await db.commit()
         except Exception as log_err:
-            print(f"Failed to save chat log: {log_err}")
-            
+            logger.error(f"Failed to save chat log: {log_err}")
+
         return {"reply": reply}
-    except Exception as e:
-        return {"reply": f"Sorry, I encountered an error: {str(e)}"}
+    except Exception:
+        logger.exception("Chat request failed")
+        return {"reply": "Sorry, something went wrong on my side. Please try again or use the contact form."}
 
 
 

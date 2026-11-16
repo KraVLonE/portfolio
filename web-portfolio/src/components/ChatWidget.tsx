@@ -43,12 +43,12 @@ export const ChatWidget: React.FC = () => {
       const res = await fetch(`${API_URL}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage, history: messages.slice(1).map(m => ({ role: m.role, content: m.content })) })
+        body: JSON.stringify({ message: userMessage, history: messages.slice(1).slice(-6).map(m => ({ role: m.role, content: m.content })) })
       });
       
       const data = await res.json();
       if (mountedRef.current) {
-        setMessages(prev => [...prev, { role: 'bot' as const, content: data.reply || "Transmission failed." }].slice(-100));
+        setMessages(prev => [...prev, { role: 'bot' as const, content: data.reply || (res.status === 429 ? "Rate limit reached. Please wait a bit before asking again." : "Transmission failed.") }].slice(-100));
       }
     } catch (err) {
       if (mountedRef.current) {
@@ -112,7 +112,8 @@ export const ChatWidget: React.FC = () => {
               type="text" 
               value={input}
               onChange={e => setInput(e.target.value)}
-              placeholder="Ask me anything..."
+              maxLength={500}
+              placeholder="Ask about skills, experience, projects..."
               aria-label="Ask the AI assistant a question"
               className="flex-1 bg-slate-900 border border-slate-800 rounded-md px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 transition-colors font-mono"
             />

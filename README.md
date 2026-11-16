@@ -1,6 +1,6 @@
 # Full Stack Portfolio
 
-A modern, containerized full-stack portfolio built with **React**, **FastAPI**, **PostgreSQL**, and a **LangGraph-powered AI Chatbot**.
+A modern, containerized full-stack portfolio built with **React**, **FastAPI**, **PostgreSQL**, and a **DeepSeek-powered AI Chatbot**.
 
 ---
 
@@ -9,7 +9,7 @@ A modern, containerized full-stack portfolio built with **React**, **FastAPI**, 
 - **Admin Panel (`admin-portfolio`)**: Secure, authenticated React dashboard for managing portfolio content (Experience, Projects, Skills, Achievements).
 - **Backend (`portfolio-backend`)**: FastAPI (Python 3.12), SQLAlchemy (Async), Uvicorn.
 - **Database (`db`)**: PostgreSQL 15 (Alpine).
-- **AI Agent**: LangGraph with Gemini Flash, featuring PII masking, RAG over the portfolio database, strict intent classification, and API key rotation.
+- **AI Assistant**: DeepSeek Flash answering from the full portfolio database in a cached system prompt, with hard input/output caps and per-IP and global daily rate limits.
 
 ---
 
@@ -26,7 +26,7 @@ cp portfolio-backend/.env.example portfolio-backend/.env
 ```
 Edit `portfolio-backend/.env` and add:
 - Your `ADMIN_SECRET_KEY` (used to log into the Admin panel).
-- Your `GEMINI_TOKENS` (comma-separated for rotation).
+- Your `DEEPSEEK_API_KEY`.
 
 ### 3. Start the Application Locally
 Run Docker Compose from the root repository folder. Local development uses `docker-compose.override.yml` to automatically map internal ports to your host machine:
